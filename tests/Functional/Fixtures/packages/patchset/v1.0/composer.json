@@ -6,7 +6,7 @@
         "creativestyle/composer-plugin-patchset": "*"
     },
     "extra": {
-        "patches": {
+        "patchset": {
             "test/simple-package": [
                 {
                     "description": "Patch in echo in the middle",

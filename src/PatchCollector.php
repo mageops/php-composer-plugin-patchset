@@ -79,7 +79,7 @@ class PatchCollector
             return [];
         }
 
-        return $this->createPatches($package->getName(), $package->getExtra()['patches']);
+        return $this->createPatches($package->getName(), $package->getExtra()['patchset']);
     }
 
     /**
@@ -88,7 +88,7 @@ class PatchCollector
      */
     public function isAValidPatchset(PackageInterface $package)
     {
-        return $package->getType() === 'patchset' && isset($package->getExtra()['patches']);
+        return $package->getType() === 'patchset' && isset($package->getExtra()['patchset']);
     }
 
     /**

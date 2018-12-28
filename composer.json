@@ -1,6 +1,6 @@
 {
     "name": "creativestyle/composer-plugin-patchset",
-    "description": "Composer plugin that automatically applies patches from a patchset file",
+    "description": "Composer plugin that automatically applies patches from a patchset package",
     "type": "composer-plugin",
     "license": "OSL-3.0",
     "authors": [
