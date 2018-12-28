@@ -20,7 +20,7 @@ abstract class SandboxTestCase extends TestCase
     {
         ComposerSandbox::$debugOutputEnabled = isset($_SERVER['argv']) && in_array('--debug', $_SERVER['argv']);
 
-        static::$sandbox = new ComposerSandbox(null, null, '/Users/dsh/tmp');
+        static::$sandbox = new ComposerSandbox();
     }
 
     /**
