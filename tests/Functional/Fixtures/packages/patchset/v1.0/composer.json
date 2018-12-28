@@ -1,0 +1,19 @@
+{
+    "name": "test/patchset",
+    "type": "patchset",
+    "version": "1.0",
+    "require": {
+        "creativestyle/composer-plugin-patchset": "*"
+    },
+    "extra": {
+        "patches": {
+            "test/simple-package": [
+                {
+                    "description": "Patch in echo in the middle",
+                    "filename": "patches/simple-package-patch.diff",
+                    "version_constraint": "*"
+                }
+            ]
+        }
+    }
+}
