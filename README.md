@@ -15,7 +15,21 @@ It's (kind-of) an alternative to two other great plugins (differences will becom
  * [cweagans/composer-patches](https://github.com/cweagans/composer-patches)
  
  
-## Features
+## Feature comparison table
+
+| Feature                                                   | creativestyle/composer-plugin-patchset    | cweagans/composer-patches 1.x  | netresearch/composer-patches-plugin |
+| --------------------------------------------------------- | :---------------------------------------: | :----------------------------: | :---------------------------------: |
+| Apply patch collection stored in a composer package       | yes                                       | no                             | no                                  |
+| Deduplicate patches                                       | yes                                       | no                             | TBD                                 |
+| Guarantees proper application on the first install        | yes                                       | no                             | TBD                                 |
+| Full functional test-suite for all features               | yes                                       | no                             | no tests at all                     |
+| PHP Version Support confirmed by tests                    | 5.6+                                      | 5.3+                           | no information                      |
+| Apply patches directly from remote locations              | no (no support planned)                   | yes                            | yes                                 |
+| Specify target package version constraints                | yes                                       | no                             | yes                                 |
+| Uninstall removed patches in all cases                    | yes                                       | no                             | TBD                                 |
+| Reapply package patches if order has changed              | yes                                       | TBD                            | TBD                                 |
+
+### Some feature hilights
 
  - Apply patches from dedicated composer packages (package your patchset!).
  - Each patch can have a version constraint (composer semver) checked against the target package.
@@ -36,8 +50,20 @@ It's (kind-of) an alternative to two other great plugins (differences will becom
    consistently on the first composer install (e.g. no `vendor` dir at all) and the subsequent ones.
    
    Double composer update/install for build is not necessary.
+   
+### Chicken or egg problem
 
-### What it cannot do 
+Patching via composer plugin has one big problem - you cannot catch all events on the first install.
+Furthermore applying patches on package install/remove is very error prone as you can never predict
+conflicts with other plugins. Therefor gathering and applying patches before everything was actually installed
+carries the risk of producing invalid state at the end. This plugin takes a different approach - it performs
+all actions at once, after the installation/update was performed, just before autoload dump (in case patching changes it).
+
+This guarantees a consistent state as the plugin compares the current state with the desired one and peforms only 
+the actions necessary to get there.  
+
+
+### No remote patches
 
  This plugin will not download patches from external sources directly (http). I consider this a bad practice and will
  never support it. I won't even comment on downloading patches using unencrypted connection without SHA check. Also what
@@ -52,8 +78,6 @@ It's (kind-of) an alternative to two other great plugins (differences will becom
  - Patch the root package / files in root directory
  - Allow to specify patches in the root composer.json
 
-
-
 ## Running tests
 
 Just start `vendor/bin/phpunit`.
@@ -64,3 +88,7 @@ vendor/bin/phpunit --debug
 
 It's nice to also add the `--testdox` switch then.
    
+   
+### Notes to myself
+
+- Tests for skipping package aliases (BTW Maybe use localrepo->getCanonicalPackages)
