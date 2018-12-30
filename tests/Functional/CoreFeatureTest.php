@@ -2,7 +2,7 @@
 
 namespace Creativestyle\Composer\Patchset\Tests\Functional;
 
-class BasicPatchingTest extends SandboxTestCase
+class CoreFeatureTest extends SandboxTestCase
 {
     const PACKAGEA_PATCH1_APPLICATIONS = [
         '/vendor/test/package-a/src/test.php' => 'patched-in-echo'
@@ -108,4 +108,26 @@ class BasicPatchingTest extends SandboxTestCase
         $this->assertNotContains('Applied patch', $updateRun->getFullOutput(), 'no patches were applied', true);
     }
 
+    public function testThatPatchesAreDeduplicated()
+    {
+        // Same patch coming from multiple patchsets shall be applied only once
+
+        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+            'require' => [
+                'test/patchset'=> '~1.0',
+                'test/patchset-extra'=> '~1.0',
+                'test/package-a'=> 'dev-master',
+                'creativestyle/composer-plugin-patchset'=> 'dev-master'
+            ]
+        ]);
+
+        $installRun = $project->runComposerCommand('install');
+
+        $this->assertThatComposerRunHasAppliedPatches($installRun,
+            array_merge_recursive(
+                self::PACKAGEA_PATCH1_APPLICATIONS,
+                self::PACKAGEA_PATCH2_APPLICATIONS
+            )
+        );
+    }
 }

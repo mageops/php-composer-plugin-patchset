@@ -157,12 +157,13 @@ class Patcher
         }
 
         foreach ($patchesByPackage as $targetPackageName => $packagePatches) {
+            /** @var PatchApplication[] $applications */
             $applications = [];
 
             $targetPackage = $repo->findPackage($targetPackageName, '*');
 
             if (null === $targetPackage) {
-                // No package to pach, nothing to do
+                // No package to patch, nothing to do
                 continue;
             }
 
@@ -170,14 +171,27 @@ class Patcher
             foreach ($packagePatches as $patch) {
                 if ($patch->canBeAppliedTo($targetPackage)) {
                     $sourcePackage = $repo->findPackage($patch->getSourcePackage(), '*');
-                    $applications[] = new PatchApplication(
+
+                    $applicationHash = $this->computeApplicationHash($sourcePackage, $patch);
+
+                    if (isset($applications[$applicationHash])) {
+                        $this->logger->notice(sprintf('Skipping patch <info>%s</info> (<comment>%s</comment> as it was already added by package <comment>%s</comment>',
+                            $patch->getDescription(),
+                            $patch->getSourcePackage(),
+                            $applications[$applicationHash]->getSourcePackage()->getName()
+                        ));
+                    }
+
+                    $applications[$applicationHash] = new PatchApplication(
                         $patch,
                         $sourcePackage,
                         $targetPackage,
-                        $this->computeApplicationHash($sourcePackage, $patch)
+                        $applicationHash
                     );
                 }
             }
+
+            $applications = array_values($applications);
 
             $packageApplications[$targetPackage->getName()] = new PackagePatchApplication($targetPackage, $applications);
         }

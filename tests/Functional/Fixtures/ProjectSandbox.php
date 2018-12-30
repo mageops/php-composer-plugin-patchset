@@ -68,7 +68,7 @@ class ProjectSandbox
     public function __construct(
         $packageName,
         $packageVersion,
-        array $config = [],
+        array $config,
         ComposerSandbox $repository,
         ProcessExecutor $executor,
         Filesystem $filesystem,
@@ -145,7 +145,7 @@ class ProjectSandbox
         // to be applied to our source fixtures and the project templates modified.
         $_ENV['COMPOSER_MIRROR_PATH_REPOS'] = '1';
 
-        $cmdElements = array_merge([$this->composerBinary, $cmd], $args);
+        $cmdElements = array_merge([$this->composerBinary, '--ansi', $cmd], $args);
         $cmdString = $cmdElements[0] . ' ' .implode(' ', array_map([ProcessExecutor::class, 'escape'], array_slice($cmdElements, 1)));
 
         $fullOut = '';
