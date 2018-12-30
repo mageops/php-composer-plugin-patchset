@@ -1,0 +1,14 @@
+diff --git a/src/test.php b/src/test.php
+index 6cb2e72..255f36b 100644
+--- a/src/test.php
++++ b/src/test.php
+@@ -1,6 +1,9 @@
+ <?php
+ 
++echo 'layered-patch-line-1';
+ echo 'first-echo';
+ echo 'patched-in-echo';
++echo 'layered-patch-line-2';
+ echo 'last-echo';
++echo 'layered-patch-line-3';
+ 

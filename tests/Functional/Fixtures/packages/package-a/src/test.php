@@ -1,5 +1,5 @@
 <?php
 
 echo 'first-echo';
-echo 'last-echo;
+echo 'last-echo';
 

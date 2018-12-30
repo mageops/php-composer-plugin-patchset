@@ -4,21 +4,31 @@ namespace Creativestyle\Composer\Patchset\Tests\Functional;
 
 class BasicPatchingTest extends SandboxTestCase
 {
+    const PACKAGEA_PATCH1_APPLICATIONS = [
+        '/vendor/test/package-a/src/test.php' => 'patched-in-echo'
+    ];
+
+    const PACKAGEA_PATCH2_APPLICATIONS = [
+        '/vendor/test/package-a/src/test.php' => [
+            'layered-patch-line-1',
+            'layered-patch-line-2',
+            'layered-patch-line-3'
+        ]
+    ];
+
     public function testSimplePatchingDuringFirstInstallWorks()
     {
         $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
             'require' => [
                 'test/patchset'=> '~1.0',
-                'test/simple-package'=> 'dev-master',
+                'test/package-a'=> 'dev-master',
                 'creativestyle/composer-plugin-patchset'=> 'dev-master'
             ]
         ]);
 
         $run = $project->runComposerCommand('install');
 
-        $this->assertThatComposerRunHasAppliedPatches($run, [
-            '/vendor/test/simple-package/src/test.php' => 'patched-in-echo'
-        ]);
+        $this->assertThatComposerRunHasAppliedPatches($run, self::PACKAGEA_PATCH1_APPLICATIONS);
     }
 
     public function testPatchingPluginIsInstalledAndExecutedWhenPulledAsPatchsetDependency()
@@ -26,15 +36,13 @@ class BasicPatchingTest extends SandboxTestCase
         $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
             'require' => [
                 'test/patchset'=> '~1.0',
-                'test/simple-package'=> 'dev-master',
+                'test/package-a'=> 'dev-master',
             ]
         ]);
 
         $run = $project->runComposerCommand('install');
 
-        $this->assertThatComposerRunHasAppliedPatches($run, [
-            '/vendor/test/simple-package/src/test.php' => 'patched-in-echo'
-        ]);
+        $this->assertThatComposerRunHasAppliedPatches($run, self::PACKAGEA_PATCH1_APPLICATIONS);
     }
 
     public function testPatchesAreAppliedWhenPackageIsAddedToExistingProject()
@@ -50,10 +58,54 @@ class BasicPatchingTest extends SandboxTestCase
         $this->assertThatComposerRunWasSuccessful($installRun);
 
         // At this point nothing to patch so no patches shall be applied
-        $requireRun = $project->runComposerCommand('require', 'test/simple-package', 'dev-master');
+        $requireRun = $project->runComposerCommand('require', 'test/package-a', 'dev-master');
 
-        $this->assertThatComposerRunHasAppliedPatches($requireRun, [
-            '/vendor/test/simple-package/src/test.php' => 'patched-in-echo'
-        ]);
+        $this->assertThatComposerRunHasAppliedPatches($requireRun, self::PACKAGEA_PATCH1_APPLICATIONS);
     }
+
+    public function testThatPatchesAreNotReappliedOnUpdate()
+    {
+        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+            'require' => [
+                'test/patchset'=> '~1.0',
+                'test/package-a'=> 'dev-master',
+                'creativestyle/composer-plugin-patchset'=> 'dev-master'
+            ]
+        ]);
+
+        $installRun = $project->runComposerCommand('install');
+
+        $this->assertThatComposerRunHasAppliedPatches($installRun, self::PACKAGEA_PATCH1_APPLICATIONS);
+
+        $updateRun = $project->runComposerCommand('update');
+
+        $this->assertContains('No patches to apply or clean', $updateRun->getFullOutput(), 'no patches were removed', true);
+        $this->assertNotContains('Applied patch', $updateRun->getFullOutput(), 'no patches were applied', true);
+    }
+
+    public function testThatLayeredPatchesAreAppliedInCorrectOrder()
+    {
+        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+            'require' => [
+                'test/patchset-extra'=> '~1.0',
+                'test/package-a'=> 'dev-master',
+                'creativestyle/composer-plugin-patchset'=> 'dev-master'
+            ]
+        ]);
+
+        $installRun = $project->runComposerCommand('install');
+
+        $this->assertThatComposerRunHasAppliedPatches($installRun,
+            array_merge_recursive(
+                self::PACKAGEA_PATCH1_APPLICATIONS,
+                self::PACKAGEA_PATCH2_APPLICATIONS
+            )
+        );
+
+        $updateRun = $project->runComposerCommand('update');
+
+        $this->assertContains('No patches to apply or clean', $updateRun->getFullOutput(), 'no patches were removed', true);
+        $this->assertNotContains('Applied patch', $updateRun->getFullOutput(), 'no patches were applied', true);
+    }
+
 }

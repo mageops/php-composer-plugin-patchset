@@ -57,16 +57,44 @@ abstract class SandboxTestCase extends TestCase
      *
      * @param ComposerRun $composerRun
      * @param array $expectedApplications
+     * @param array $forbiddenApplications
      */
     protected function assertThatComposerRunHasAppliedPatches(
         ComposerRun $composerRun,
-        array $expectedApplications
+        array $expectedApplications,
+        array $forbiddenApplications = []
     ) {
         $this->assertThatComposerRunWasSuccessful($composerRun);
 
-        foreach ($expectedApplications as $filePath => $expectedText) {
+        foreach ($expectedApplications as $filePath => $expectedTexts) {
             $this->assertTrue($composerRun->getProject()->hasFile($filePath), sprintf('file %s to be patched exists', $filePath));
-            $this->assertContains($expectedText, $composerRun->getProject()->getFileContents($filePath), sprintf('file `%s` has been patched - contains patched in string `%s`', $filePath, $expectedText));
+
+            if (!is_array($expectedTexts)) {
+                $expectedTexts = [$expectedTexts];
+            }
+
+            $fileContents = $composerRun->getProject()->getFileContents($filePath);
+
+            foreach ($expectedTexts as $expectedText) {
+                $this->assertContains($expectedText, $fileContents, sprintf('file `%s` has been patched - contains patched in string `%s`', $filePath, $expectedText));
+            }
+        }
+
+        foreach ($forbiddenApplications as $filePath => $forbiddenTexts) {
+            if (!$composerRun->getProject()->hasFile($filePath)) {
+                /* It's expected that the file might not exists if patch creates it */
+                continue;
+            }
+
+            if (!is_array($forbiddenTexts)) {
+                $forbiddenTexts = [$forbiddenTexts];
+            }
+
+            $fileContents = $composerRun->getProject()->getFileContents($filePath);
+
+            foreach ($forbiddenTexts as $forbiddenText) {
+                $this->assertNotContains($forbiddenText, $fileContents, sprintf('file `%s` has not been patched - does not contain patched in string `%s`', $filePath, $forbiddenText));
+            }
         }
     }
 
@@ -75,7 +103,7 @@ abstract class SandboxTestCase extends TestCase
      */
     public static function tearDownAfterClass()
     {
-//        static::$sandbox->cleanup();
+        static::$sandbox->cleanup();
         static::$sandbox = null;
     }
 }

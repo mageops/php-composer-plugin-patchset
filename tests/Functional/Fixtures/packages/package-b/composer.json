@@ -1,5 +1,5 @@
 {
-    "name": "test/simple-package",
+    "name": "test/package-b",
     "type": "library",
     "version": "dev-master",
     "require": {}

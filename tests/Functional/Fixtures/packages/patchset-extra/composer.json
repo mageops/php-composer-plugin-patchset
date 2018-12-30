@@ -1,5 +1,5 @@
 {
-    "name": "test/patchset",
+    "name": "test/patchset-extra",
     "type": "patchset",
     "version": "1.0",
     "require": {
@@ -11,6 +11,10 @@
                 {
                     "description": "Patch in echo in the middle",
                     "filename": "patches/package-a-patch-1.diff"
+                },
+                {
+                    "description": "Patch in echo at the end",
+                    "filename": "patches/package-a-patch-2.diff"
                 }
             ]
         }
