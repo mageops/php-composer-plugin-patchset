@@ -1,0 +1,24 @@
+{
+    "name": "test/patchset",
+    "type": "patchset",
+    "version": "2.0",
+    "require": {
+        "creativestyle/composer-plugin-patchset": "dev-master"
+    },
+    "extra": {
+        "patchset": {
+            "test/package-a": [
+                {
+                    "description": "Patch in echo in the middle",
+                    "filename": "patches/package-a-patch-1-p0.diff",
+                    "strip-path-components": 0
+                },
+                {
+                    "description": "Patch in echo at the end",
+                    "filename": "patches/package-a-patch-2-p2.diff",
+                    "strip-path-components": 2
+                }
+            ]
+        }
+    }
+}

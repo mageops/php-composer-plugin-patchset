@@ -1,0 +1,9 @@
+--- src/test.php
++++ src/test.php
+@@ -1,5 +1,6 @@
+ <?php
+ 
+ echo 'first-echo';
++echo 'patched-in-echo';
+ echo 'last-echo';
+ 

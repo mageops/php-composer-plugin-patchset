@@ -226,4 +226,23 @@ class CoreFeatureTest extends SandboxTestCase
         $installRun = $project->runComposerCommand('install');
         $this->assertThatComposerRunHasAppliedPatches($installRun, self::ROOT_PACKAGE_APPLICATIONS);
     }
+
+    public function testArbitraryNumberOfPathComponentsCanBeStripped()
+    {
+        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+            'require' => [
+                'test/patchset' => '2.0',
+                'test/package-a' => 'dev-master',
+            ]
+        ]);
+
+        $installRun = $project->runComposerCommand('install', '-vvv');
+
+        $this->assertThatComposerRunHasAppliedPatches($installRun,
+            array_merge_recursive(
+                self::PACKAGEA_PATCH1_APPLICATIONS,
+                self::PACKAGEA_PATCH2_APPLICATIONS
+            )
+        );
+    }
 }

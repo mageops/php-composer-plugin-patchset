@@ -106,7 +106,7 @@ class PatchApplicator
         $targetDirectory = $this->pathResolver->getPackageInstallPath($targetPackage);
         $patchFilename = $this->pathResolver->getPatchSourceFilePath($sourcePackage, $patch);
 
-        if (!$this->executePatchCommand($targetDirectory, $patchFilename, 1)) {
+        if (!$this->executePatchCommand($targetDirectory, $patchFilename, $patch->getStripPathComponents())) {
             throw new \RuntimeException('Could not apply patch: ' . $this->cmdErr);
         }
 

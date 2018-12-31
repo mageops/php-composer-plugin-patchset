@@ -44,24 +44,32 @@ class Patch
     private $filename;
 
     /**
+     * @var int
+     */
+    private $stripPathComponents = 1;
+
+    /**
      * @param $sourcePackage
      * @param string $targetPackage
      * @param string $versionConstraint
      * @param string $filename
      * @param string $description
+     * @param int $stripPathComponents
      */
     public function __construct(
         $sourcePackage,
         $targetPackage,
         $versionConstraint,
         $filename,
-        $description
+        $description,
+        $stripPathComponents = 1
     ) {
         $this->sourcePackage = $sourcePackage;
         $this->targetPackage = $targetPackage;
         $this->versionConstraint = $versionConstraint;
         $this->filename = $filename;
         $this->description = $description;
+        $this->stripPathComponents = $stripPathComponents;
     }
 
     /**
@@ -73,16 +81,18 @@ class Patch
     public static function createFromConfig($sourcePackage, $targetPackage, array $config)
     {
         $config = array_merge([
-            'version_constraint' => '*',
+            'version-constraint' => '*',
             'description' => null,
+            'strip-path-components' => 1
         ], $config);
 
         return new static(
             $sourcePackage,
             $targetPackage,
-            $config['version_constraint'],
+            $config['version-constraint'],
             $config['filename'],
-            $config['description']
+            $config['description'],
+            $config['strip-path-components']
         );
     }
 
@@ -94,7 +104,8 @@ class Patch
             $data['target_package'],
             $data['version_constraint'],
             $data['filename'],
-            $data['description']
+            $data['description'],
+            $data['strip_path_components']
         );
     }
 
@@ -155,6 +166,15 @@ class Patch
         return $this->description;
     }
 
+    /**
+     * @return int
+     */
+    public function getStripPathComponents()
+    {
+        return $this->stripPathComponents;
+    }
+
+
     public function toArray()
     {
         return [
@@ -163,6 +183,7 @@ class Patch
             'version_constraint' => $this->versionConstraint,
             'filename' => $this->filename,
             'description' => $this->description,
+            'strip_path_components' => $this->stripPathComponents
         ];
     }
 }
