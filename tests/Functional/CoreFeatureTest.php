@@ -63,7 +63,7 @@ class CoreFeatureTest extends SandboxTestCase
         $this->assertThatComposerRunHasAppliedPatches($requireRun, self::PACKAGEA_PATCH1_APPLICATIONS);
     }
 
-    public function testThatPatchesAreNotReappliedOnUpdate()
+    public function testPatchesAreNotReappliedOnUpdate()
     {
         $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
             'require' => [
@@ -83,7 +83,7 @@ class CoreFeatureTest extends SandboxTestCase
         $this->assertNotContains('Applied patch', $updateRun->getFullOutput(), 'no patches were applied', true);
     }
 
-    public function testThatLayeredPatchesAreAppliedInCorrectOrder()
+    public function testLayeredPatchesAreAppliedInCorrectOrder()
     {
         $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
             'require' => [
@@ -108,7 +108,7 @@ class CoreFeatureTest extends SandboxTestCase
         $this->assertNotContains('Applied patch', $updateRun->getFullOutput(), 'no patches were applied', true);
     }
 
-    public function testThatPatchesAreDeduplicated()
+    public function testPatchesAreDeduplicated()
     {
         // Same patch coming from multiple patchsets shall be applied only once
 
@@ -129,5 +129,39 @@ class CoreFeatureTest extends SandboxTestCase
                 self::PACKAGEA_PATCH2_APPLICATIONS
             )
         );
+    }
+
+    public function testRemovingPatchsetWillRemovePatches()
+    {
+        // Same patch coming from multiple patchsets shall be applied only once
+
+        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+            'require' => [
+                'test/patchset'=> '~1.0',
+                'test/patchset-extra'=> '~1.0',
+                'test/package-a'=> 'dev-master',
+                'creativestyle/composer-plugin-patchset'=> 'dev-master'
+            ]
+        ]);
+
+        $installRun = $project->runComposerCommand('install');
+
+        $this->assertThatComposerRunHasAppliedPatches($installRun,
+            array_merge_recursive(
+                self::PACKAGEA_PATCH1_APPLICATIONS,
+                self::PACKAGEA_PATCH2_APPLICATIONS
+            )
+        );
+
+        $removeRun = $project->runComposerCommand('remove', 'test/patchset-extra');
+
+        $this->assertContains('Reinstalling test/package-a', $removeRun->getFullOutput(), 'test/package-a has been reinstalled', true);
+
+        // First patch is coming from the first patchset so it still should be applied
+        $this->assertThatComposerRunHasAppliedPatches($removeRun,
+            self::PACKAGEA_PATCH1_APPLICATIONS,
+            self::PACKAGEA_PATCH2_APPLICATIONS
+        );
+
     }
 }

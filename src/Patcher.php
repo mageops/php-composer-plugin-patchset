@@ -116,7 +116,8 @@ class Patcher
         $this->packageApplicationRepository = new PackageApplicationRepository(
             $this->repositoryManager->getLocalRepository(),
             $this->installationManager,
-            $this->pathResolver
+            $this->pathResolver,
+            $this->logger
         );
 
         $this->patches = $this->collectPatches();

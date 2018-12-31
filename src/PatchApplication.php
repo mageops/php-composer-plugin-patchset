@@ -15,7 +15,7 @@ class PatchApplication
     private $patch;
 
     /**
-     * @var PackageInterface
+     * @var PackageInterface|null
      */
     private $sourcePackage;
 
@@ -37,7 +37,7 @@ class PatchApplication
      */
     public function __construct(
         Patch $patch,
-        PackageInterface $sourcePackage,
+        PackageInterface $sourcePackage = null,
         PackageInterface $targetPackage,
         $hash
     ) {
@@ -64,7 +64,10 @@ class PatchApplication
     }
 
     /**
-     * @return PackageInterface
+     * Source package may be null if the patchset has been removed,
+     * but the patch is still applied.
+     *
+     * @return PackageInterface|null
      */
     public function getSourcePackage()
     {

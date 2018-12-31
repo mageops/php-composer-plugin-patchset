@@ -6,6 +6,7 @@ use Composer\Installer\InstallationManager;
 use Composer\Package\AliasPackage;
 use Composer\Package\PackageInterface;
 use Composer\Repository\RepositoryInterface;
+use Psr\Log\LoggerInterface;
 
 class PackageApplicationRepository
 {
@@ -22,20 +23,27 @@ class PackageApplicationRepository
      * @var PathResolver
      */
     private $pathResolver;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * @param RepositoryInterface $installedRepository
      * @param InstallationManager $installationManager
      * @param PathResolver $pathResolver
+     * @param LoggerInterface $logger
      */
     public function __construct(
         RepositoryInterface $installedRepository,
         InstallationManager $installationManager,
-        PathResolver $pathResolver
+        PathResolver $pathResolver,
+        LoggerInterface $logger
     ) {
         $this->installedRepository = $installedRepository;
         $this->installationManager = $installationManager;
         $this->pathResolver = $pathResolver;
+        $this->logger = $logger;
     }
 
     /**
@@ -137,7 +145,7 @@ class PackageApplicationRepository
         );
 
         if (!$sourcePackage) {
-            throw new \RuntimeException(sprintf('Could not find source package %s (%s) for installed patch',
+            $this->logger->debug(sprintf('Could not find source package %s (%s) for installed patch, it was removed probably',
                 $data['source_package']['name'],
                 $data['source_package']['version']
             ));
