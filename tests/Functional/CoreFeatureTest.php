@@ -236,7 +236,7 @@ class CoreFeatureTest extends SandboxTestCase
             ]
         ]);
 
-        $installRun = $project->runComposerCommand('install', '-vvv');
+        $installRun = $project->runComposerCommand('install');
 
         $this->assertThatComposerRunHasAppliedPatches($installRun,
             array_merge_recursive(
@@ -244,5 +244,28 @@ class CoreFeatureTest extends SandboxTestCase
                 self::PACKAGEA_PATCH2_APPLICATIONS
             )
         );
+    }
+
+    public function testGitApplyCanBeUsedForPatching()
+    {
+        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+            'require' => [
+                'test/patchset-git' => '1.0',
+                'test/package-a' => 'dev-master',
+            ]
+        ]);
+
+        $installRun = $project->runComposerCommand('install', '-vvv');
+
+        $this->assertThatComposerRunHasAppliedPatches($installRun,
+            array_merge_recursive(
+                self::PACKAGEA_PATCH1_APPLICATIONS,
+                self::PACKAGEA_PATCH2_APPLICATIONS,
+                self::ROOT_PACKAGE_APPLICATIONS
+            )
+        );
+
+        $this->assertContains('using git method', $installRun->getFullOutput(), 'patches were applied using git', true);
+        $this->assertNotContains('using patch method', $installRun->getFullOutput(), 'no patches were applied using patch command', true);
     }
 }

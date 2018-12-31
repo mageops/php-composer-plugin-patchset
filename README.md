@@ -29,6 +29,7 @@ It's (kind-of) an alternative to two other great plugins (differences will becom
 | Specify target package version constraints                | yes                                       | no                             | yes                                 |
 | Uninstall removed patches in all cases                    | yes                                       | no                             | TBD                                 |
 | Reapply package patches if order has changed              | yes                                       | TBD                            | TBD                                 |
+| Choose application method (git/patch) per patch           | yes                                       | TBD                            | TBD                                 |
 
 ### Some feature hilights
 
@@ -61,7 +62,11 @@ carries the risk of producing invalid state at the end. This plugin takes a diff
 all actions at once, after the installation/update was performed, just before autoload dump (in case patching changes it).
 
 This guarantees a consistent state as the plugin compares the current state with the desired one and peforms only 
-the actions necessary to get there.  
+the actions necessary to get there.
+
+**This has one drawback, if your project uses any composer plugins that copy files from vendors to the root
+of your project then you should patch the root package because the patch applications will happen after those
+plugins have done their work so patching source files in vendor will have no effect.**
 
 
 ### No remote patches

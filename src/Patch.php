@@ -49,12 +49,18 @@ class Patch
     private $stripPathComponents = 1;
 
     /**
+     * @var string
+     */
+    private $method = PatchApplicator::METHOD_PATCH;
+
+    /**
      * @param $sourcePackage
      * @param string $targetPackage
      * @param string $versionConstraint
      * @param string $filename
      * @param string $description
      * @param int $stripPathComponents
+     * @param string $method
      */
     public function __construct(
         $sourcePackage,
@@ -62,7 +68,8 @@ class Patch
         $versionConstraint,
         $filename,
         $description,
-        $stripPathComponents = 1
+        $stripPathComponents = 1,
+        $method = PatchApplicator::METHOD_PATCH
     ) {
         $this->sourcePackage = $sourcePackage;
         $this->targetPackage = $targetPackage;
@@ -70,6 +77,7 @@ class Patch
         $this->filename = $filename;
         $this->description = $description;
         $this->stripPathComponents = $stripPathComponents;
+        $this->method = $method;
     }
 
     /**
@@ -83,8 +91,17 @@ class Patch
         $config = array_merge([
             'version-constraint' => '*',
             'description' => null,
-            'strip-path-components' => 1
+            'strip-path-components' => 1,
+            'method' => PatchApplicator::METHOD_PATCH
         ], $config);
+
+        if (!in_array($config['method'], PatchApplicator::METHODS)) {
+            throw new \RuntimeException(sprintf('Unsupported patch application method "%s" in patchset "%s", use one of %s',
+                $config['method'],
+                $sourcePackage,
+                join(', ', PatchApplicator::METHODS)
+            ));
+        }
 
         return new static(
             $sourcePackage,
@@ -92,7 +109,8 @@ class Patch
             $config['version-constraint'],
             $config['filename'],
             $config['description'],
-            $config['strip-path-components']
+            $config['strip-path-components'],
+            $config['method']
         );
     }
 
@@ -105,7 +123,8 @@ class Patch
             $data['version_constraint'],
             $data['filename'],
             $data['description'],
-            $data['strip_path_components']
+            $data['strip_path_components'],
+            $data['method']
         );
     }
 
@@ -174,6 +193,13 @@ class Patch
         return $this->stripPathComponents;
     }
 
+    /**
+     * @return string
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
 
     public function toArray()
     {
@@ -183,7 +209,8 @@ class Patch
             'version_constraint' => $this->versionConstraint,
             'filename' => $this->filename,
             'description' => $this->description,
-            'strip_path_components' => $this->stripPathComponents
+            'strip_path_components' => $this->stripPathComponents,
+            'method' => $this->method
         ];
     }
 }

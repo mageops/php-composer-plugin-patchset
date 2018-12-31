@@ -1,0 +1,32 @@
+{
+    "name": "test/patchset-git",
+    "type": "patchset",
+    "version": "1.0",
+    "require": {
+        "creativestyle/composer-plugin-patchset": "dev-master"
+    },
+    "extra": {
+        "patchset": {
+            "test/package-a": [
+                {
+                    "description": "Patch in echo in the middle",
+                    "filename": "patches/package-a-patch-1.diff",
+                    "method": "git"
+                },
+                {
+                    "description": "Patch in echo at the end",
+                    "filename": "patches/package-a-patch-2-p2.diff",
+                    "strip-path-components": 2,
+                    "method": "git"
+                }
+            ],
+            "test/project-template": [
+                {
+                    "description": "Patch project root",
+                    "filename": "patches/root-project-patch-1.diff",
+                    "method": "git"
+                }
+            ]
+        }
+    }
+}
