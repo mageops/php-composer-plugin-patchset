@@ -114,7 +114,7 @@ class PatchApplicator
         if ($method === self::METHOD_PATCH && $this->hasPatchCommand()) {
             $cmd = ['patch', '--posix', '--strip=' . $stripPathComponents, '--input='.$patchFile,  '--directory='.$targetDirectory];
         } else {
-            $cmd = ['git', 'apply', '-v', '-p' . $stripPathComponents, '--ignore-whitespace', $patchFile];
+            $cmd = ['git', 'apply', '-v', '-p' . $stripPathComponents, $patchFile];
 
             if (is_dir(rtrim($targetDirectory, '/') . '/.git')) {
                 // Target dir is a git repo so apply relative to it - apparently some git versions have problems otherwise.
