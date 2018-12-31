@@ -16,6 +16,10 @@ class CoreFeatureTest extends SandboxTestCase
         ]
     ];
 
+    const ROOT_PACKAGE_APPLICATIONS = [
+        '/src/root-code.php' => '-is-patched'
+    ];
+
     public function testSimplePatchingDuringFirstInstallWorks()
     {
         $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
@@ -162,6 +166,18 @@ class CoreFeatureTest extends SandboxTestCase
             self::PACKAGEA_PATCH1_APPLICATIONS,
             self::PACKAGEA_PATCH2_APPLICATIONS
         );
+    }
 
+    public function testRootPackageCanBePatched()
+    {
+        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+            'require' => [
+                'test/patchset-root'=> '~1.0',
+            ]
+        ]);
+
+        $installRun = $project->runComposerCommand('install');
+
+        $this->assertThatComposerRunHasAppliedPatches($installRun, self::ROOT_PACKAGE_APPLICATIONS);
     }
 }

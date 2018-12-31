@@ -19,10 +19,12 @@ class PackageApplicationRepository
      * @var InstallationManager
      */
     private $installationManager;
+
     /**
      * @var PathResolver
      */
     private $pathResolver;
+
     /**
      * @var LoggerInterface
      */

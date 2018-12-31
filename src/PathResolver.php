@@ -4,6 +4,7 @@ namespace Creativestyle\Composer\Patchset;
 
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
+use Composer\Package\RootPackageInterface;
 
 class PathResolver
 {
@@ -26,6 +27,12 @@ class PathResolver
      */
     public function getPackageInstallPath(PackageInterface $package)
     {
+        if ($package instanceof RootPackageInterface) {
+            // This is not an ideal solution but should work for now.
+            // I haven't found an easy way to get this information from composer itself.
+            return getcwd();
+        }
+
         $installer = $this->installationManager->getInstaller($package->getType());
 
         return $installer->getInstallPath($package);

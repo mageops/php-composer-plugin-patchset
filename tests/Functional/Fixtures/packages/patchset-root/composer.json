@@ -1,0 +1,18 @@
+{
+    "name": "test/patchset-root",
+    "type": "patchset",
+    "version": "1.0",
+    "require": {
+        "creativestyle/composer-plugin-patchset": "dev-master"
+    },
+    "extra": {
+        "patchset": {
+            "test/project-template": [
+                {
+                    "description": "Patch project root",
+                    "filename": "patches/root-project-patch-1.diff"
+                }
+            ]
+        }
+    }
+}

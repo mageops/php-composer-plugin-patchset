@@ -5,7 +5,9 @@ namespace Creativestyle\Composer\Patchset;
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
+use Composer\Package\PackageInterface;
 use Composer\Plugin\PluginInterface;
+use Composer\Repository\ArrayRepository;
 use Composer\Script\ScriptEvents;
 use Composer\Script\Event as ScriptEvent;
 
@@ -62,7 +64,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             $this->logger,
             $composer->getInstallationManager(),
             $composer->getRepositoryManager(),
-            new ProcessExecutor($this->io)
+            new ProcessExecutor($this->io),
+            $composer->getPackage()
         );
 
         $patcher->patch();

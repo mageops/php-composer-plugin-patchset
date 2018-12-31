@@ -7,6 +7,8 @@ use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
 
+use Composer\Package\RootPackageInterface;
+use Composer\Repository\ArrayRepository;
 use Composer\Repository\RepositoryManager;
 use Composer\Util\ProcessExecutor;
 use Psr\Log\LoggerInterface;
@@ -84,6 +86,16 @@ class Patcher
     private $processExecutor;
 
     /**
+     * @var ArrayRepository
+     */
+    private $installedRepository;
+
+    /**
+     * @var RootPackageInterface
+     */
+    private $rootPackage;
+
+    /**
      * The constructor computes state, so it needs to be called only after all packages have been installed
      * and the local composer repository updated.
      *
@@ -91,20 +103,24 @@ class Patcher
      * @param InstallationManager $installationManager
      * @param RepositoryManager $repositoryManager
      * @param ProcessExecutor $processExecutor
+     * @param RootPackageInterface $rootPackage
      */
     public function __construct(
         LoggerInterface $logger,
         InstallationManager $installationManager,
         RepositoryManager $repositoryManager,
-        ProcessExecutor $processExecutor
+        ProcessExecutor $processExecutor,
+        RootPackageInterface $rootPackage
     ) {
         $this->logger = $logger;
+        $this->rootPackage = $rootPackage;
         $this->collector = new PatchCollector($this->logger);
         $this->operationResolver = new OperationResolver();
         $this->installationManager = $installationManager;
         $this->repositoryManager = $repositoryManager;
         $this->pathResolver = new PathResolver($installationManager);
         $this->processExecutor = $processExecutor;
+        $this->installedRepository = $this->buildInstalledRepository();
 
         $this->applicator = new PatchApplicator(
             $this->logger,
@@ -114,7 +130,7 @@ class Patcher
         );
 
         $this->packageApplicationRepository = new PackageApplicationRepository(
-            $this->repositoryManager->getLocalRepository(),
+            $this->installedRepository,
             $this->installationManager,
             $this->pathResolver,
             $this->logger
@@ -125,6 +141,23 @@ class Patcher
         $this->installedPackageApplications = $this->packageApplicationRepository->getPackageApplications();
 
         list($this->packagesToReinstall, $this->packagesToPatch) = $this->computeChanges();
+
+    }
+
+    /**
+     * @return ArrayRepository
+     */
+    private function buildInstalledRepository()
+    {
+        $repo = new ArrayRepository(array_map(function(PackageInterface $package) {
+            return clone $package;
+        }, $this->repositoryManager->getLocalRepository()->getCanonicalPackages()));
+
+        $rootPackage = clone $this->rootPackage;
+
+        $repo->addPackage($rootPackage);
+
+        return $repo;
     }
 
     /**
@@ -133,7 +166,7 @@ class Patcher
     private function collectPatches()
     {
         return $this->collector->collectFromRepository(
-            $this->repositoryManager->getLocalRepository()
+           $this->installedRepository
         );
     }
 
@@ -143,7 +176,7 @@ class Patcher
     private function computeTargetPackageApplications()
     {
         $packageApplications = [];
-        $repo = $this->repositoryManager->getLocalRepository();
+        $repo = $this->installedRepository;
 
         $patchesByPackage = [];
 

@@ -34,6 +34,11 @@ class PatchApplicator
      */
     private $executor;
 
+    /**
+     * @var string
+     */
+    private $cmdErr;
+
     public function __construct(
         LoggerInterface $logger,
         InstallationManager $installationManager,
@@ -61,7 +66,10 @@ class PatchApplicator
             $cmd = $cmd[0] . ' ' .implode(' ', array_map([ProcessExecutor::class, 'escape'], array_slice($cmd, 1)));
         }
 
-        return $this->executor->execute($cmd, $output, $cwd);
+        $returnCode = $this->executor->execute($cmd, $output, $cwd);
+        $this->cmdErr = $this->executor->getErrorOutput();
+
+        return $returnCode;
     }
 
     /**
@@ -99,7 +107,7 @@ class PatchApplicator
         $patchFilename = $this->pathResolver->getPatchSourceFilePath($sourcePackage, $patch);
 
         if (!$this->executePatchCommand($targetDirectory, $patchFilename, 1)) {
-            throw new \RuntimeException('Could not apply it!');
+            throw new \RuntimeException('Could not apply patch: ' . $this->cmdErr);
         }
 
         $this->logger->notice(sprintf('Applied patch <info>%s:%s</info> [<comment>%s</comment>] (<comment>%s</comment>)',
