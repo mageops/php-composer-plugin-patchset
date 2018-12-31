@@ -1,0 +1,7 @@
+{
+    "name": "test/project-template-patchset",
+    "type": "project",
+    "version": "dev-master",
+    "require": {},
+    "minimum-stability": "dev"
+}

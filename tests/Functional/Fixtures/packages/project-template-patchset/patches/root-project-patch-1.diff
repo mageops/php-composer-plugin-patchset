@@ -1,0 +1,12 @@
+diff --git a/src/root-code.php b/src/root-code.php
+index 78866cc..732f877 100644
+--- a/src/root-code.php
++++ b/src/root-code.php
+@@ -2,6 +2,7 @@
+ 
+ foreach (['this', 'is', 'root', 'package', 'code'] as $word) {
+     echo $word;
++    echo "-is-patched\n";
+ }
+ 
+ echo 'done';

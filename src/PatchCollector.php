@@ -5,6 +5,7 @@ namespace Creativestyle\Composer\Patchset;
 use Composer\Package\AliasPackage;
 use Composer\Package\Package;
 use Composer\Package\PackageInterface;
+use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryInterface;
 
 use Psr\Log\LoggerInterface;
@@ -88,7 +89,7 @@ class PatchCollector
      */
     public function isAValidPatchset(PackageInterface $package)
     {
-        return $package->getType() === 'patchset' && isset($package->getExtra()['patchset']);
+        return ($package instanceof RootPackageInterface || $package->getType() === 'patchset') && isset($package->getExtra()['patchset']);
     }
 
     /**

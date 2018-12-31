@@ -180,4 +180,50 @@ class CoreFeatureTest extends SandboxTestCase
 
         $this->assertThatComposerRunHasAppliedPatches($installRun, self::ROOT_PACKAGE_APPLICATIONS);
     }
+
+    public function testRootCanDefinePatches()
+    {
+        $project = $this->getSandbox()->createProjectSandBox('test/project-template-patchset', 'dev-master', [
+            'require' => [
+                'test/package-a'=> 'dev-master',
+                'creativestyle/composer-plugin-patchset'=> 'dev-master'
+            ],
+            'extra' => [
+                'patchset' => [
+                    'test/package-a' => [
+                        [
+                            'description' => 'Patch in echo in the middle',
+                            'filename' => 'patches/package-a-patch-1.diff'
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+
+        $installRun = $project->runComposerCommand('install');
+        $this->assertThatComposerRunHasAppliedPatches($installRun, self::PACKAGEA_PATCH1_APPLICATIONS);
+    }
+
+    public function testRootCanPatchItself()
+    {
+        $project = $this->getSandbox()->createProjectSandBox('test/project-template-patchset', 'dev-master', [
+            'require' => [
+                'test/package-a'=> 'dev-master',
+                'creativestyle/composer-plugin-patchset'=> 'dev-master'
+            ],
+            'extra' => [
+                'patchset' => [
+                    'test/project-template-patchset' => [
+                        [
+                            'description' => 'Patch project root',
+                            'filename' => 'patches/root-project-patch-1.diff'
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+
+        $installRun = $project->runComposerCommand('install');
+        $this->assertThatComposerRunHasAppliedPatches($installRun, self::ROOT_PACKAGE_APPLICATIONS);
+    }
 }

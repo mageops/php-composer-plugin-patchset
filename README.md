@@ -72,11 +72,6 @@ the actions necessary to get there.
  Also you will not be able to specify patches in any composer package. You have to use a dedicated packages for this 
  purpose. I can hardly imagine a legit use case when it would be desirable that installing package X will automatically 
  patch some other package Y in your project without explicitly being advertised as a patchset.
- 
-### What is missing
-
- - Patch the root package / files in root directory
- - Allow to specify patches in the root composer.json
 
 ## Running tests
 
