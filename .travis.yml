@@ -22,4 +22,4 @@ matrix:
 install:
     - travis_retry composer install --ansi --prefer-dist --no-interaction --optimize-autoloader --no-suggest --no-progress
 
-script: ./vendor/bin/phpunit
+script: ./vendor/bin/phpunit --debug
