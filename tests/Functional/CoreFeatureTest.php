@@ -255,7 +255,7 @@ class CoreFeatureTest extends SandboxTestCase
             ]
         ]);
 
-        $installRun = $project->runComposerCommand('install', '-vvv');
+        $installRun = $project->runComposerCommand('install');
 
         $this->assertThatComposerRunHasAppliedPatches($installRun,
             array_merge_recursive(

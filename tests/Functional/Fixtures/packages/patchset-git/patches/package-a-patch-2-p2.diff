@@ -1,11 +1,12 @@
 --- vendor/test/src/test.php
 +++ vendor/test/src/test.php
-@@ -1,5 +1,8 @@
+@@ -1,6 +1,9 @@
  <?php
- 
-+echo 'layered-patch-line-1'
+
++echo 'layered-patch-line-1';
  echo 'first-echo';
  echo 'patched-in-echo';
-+echo 'layered-patch-line-2'
++echo 'layered-patch-line-2';
  echo 'last-echo';
-+echo 'layered-patch-line-3'
++echo 'layered-patch-line-3';
+
