@@ -36,6 +36,7 @@ It's (kind-of) an alternative to two other great plugins (differences will becom
     <sup>1</sup> Root package patching is the exception, please see [applying patches to root package](Applying patches to root package (root project folder)) in usage docs section.
 </small>
 
+
 Works in newline? [applying patches to root package](Applying patches to root package (root project folder))
 
 ### Some feature hilights
