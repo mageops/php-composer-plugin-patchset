@@ -16,7 +16,11 @@ It's (kind-of) an alternative to two other great plugins (differences will becom
  * [cweagans/composer-patches](https://github.com/cweagans/composer-patches)
  
  
-**If you're already convinced skip to [Usage Documentation](docs/usage.md).**
+**Continue reading this document for general description or skip to:**
+
+ * [Usage Documentation](docs/usage.md)
+ * [Creating Patches Howto](docs/creating-patches.md)
+ * [Testing](docs/testing.md)
  
 ## Feature comparison table
 
@@ -86,13 +90,4 @@ plugins have done their work so patching source files in vendor will have no eff
  purpose. I can hardly imagine a legit use case when it would be desirable that installing package X will automatically 
  patch some other package Y in your project without explicitly being advertised as a patchset.
 
-## Running tests
 
-Just start `vendor/bin/phpunit`.
-If you want to see the output of commands executed during functional testing use the `--debug` switch:
-```
-vendor/bin/phpunit --debug
-```
-
-It's nice to also add the `--testdox` switch then.
-   
