@@ -254,6 +254,15 @@ class Patcher
         $localRepo = $this->repositoryManager->getLocalRepository();
 
         foreach ($this->packagesToReinstall as $package) {
+            if ($package instanceof RootPackageInterface) {
+                $this->logger->warning(sprintf('Root package patches have changed but cannot reinstall it, will apply only new patches. You should reinstall the whole project to be safe.',
+                    $package->getName(),
+                    $package->getPrettyVersion()
+                ));
+
+                continue;
+            }
+
             $this->logger->notice(sprintf('Reinstalling <info>%s</info> (<comment>%s</comment>) for re-patch',
                 $package->getName(),
                 $package->getPrettyVersion()
@@ -291,6 +300,16 @@ class Patcher
 
             $this->packageApplicationRepository->savePackageApplication($packagePatchApplication);
         }
+    }
+
+    private function applyPatchesToPackage(PackagePatchApplication $packagePatchApplication)
+    {
+
+    }
+
+    private function applyPatchesToRootPackage(PackagePatchApplication $packagePatchApplication)
+    {
+
     }
 
     /**

@@ -27,9 +27,14 @@ It's (kind-of) an alternative to two other great plugins (differences will becom
 | PHP Version Support confirmed by tests                    | 5.6+                                      | 5.3+                           | no information                      |
 | Apply patches directly from remote locations              | no (no support planned)                   | yes                            | yes                                 |
 | Specify target package version constraints                | yes                                       | no                             | yes                                 |
-| Uninstall removed patches in all cases                    | yes                                       | no                             | TBD                                 |
+| Uninstall removed patches in all cases<sup>1</sup>        | yes                                      | no                             | TBD                                 |
 | Reapply package patches if order has changed              | yes                                       | TBD                            | TBD                                 |
 | Choose application method (git/patch) per patch           | yes                                       | TBD                            | TBD                                 |
+| Apply patches to root package/directory                   | yes                                       | no                             | TBD                                 |
+
+<small>
+    <sup>1</sup> Root package patching is the exception, please see [Applying patches to root package]() in usage docs section.
+</small>
 
 ### Some feature hilights
 
@@ -84,6 +89,18 @@ plugins have done their work so patching source files in vendor will have no eff
 ### Create *patchset* composer package
 
 ### Define patches in your root package
+
+### Applying patches to root package (root project folder)
+
+Define patches as you normally would. If your root package is not named the you should use special
+`__root__` as package name.
+
+**CAUTION** Since root package cannot be reinstalled once patches are applied they cannot be removed!
+This means that if you want to remove patches applied to root package you should reinstall the whole
+project manually. The plugin will warn you when this is the case but will not fail. It will try
+to apply any new root package patches though.
+
+__New patches will be applied to the root package but then _application order_ is not guaranteed.__
 
 ### Options
 

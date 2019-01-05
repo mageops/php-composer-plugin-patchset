@@ -31,7 +31,7 @@ class PatchApplication
 
     /**
      * @param Patch $patch
-     * @param PackageInterface $sourcePackage
+     * @param PackageInterface|null $sourcePackage
      * @param PackageInterface $targetPackage
      * @param string $hash
      */
