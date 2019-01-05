@@ -37,7 +37,11 @@ It's (kind-of) an alternative to two other great plugins (differences will becom
 </small>
 
 
-Works in newline? [applying patches to root package](Applying patches to root package (root project folder))
+Test2: [applying patches to root package](#sth)
+
+Test1: [applying patches to root package](Applying patches to root package (root project folder))
+
+
 
 ### Some feature hilights
 
