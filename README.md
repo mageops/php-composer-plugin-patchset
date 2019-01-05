@@ -33,7 +33,7 @@ It's (kind-of) an alternative to two other great plugins (differences will becom
 | Apply patches to root package/directory                   | yes                                       | no                             | TBD                                 |
 
 <small>
-    <sup>1</sup> Root package patching is the exception, please see [Applying patches to root package]() in usage docs section.
+    <sup>1</sup> Root package patching is the exception, please see [Applying patches to root package](#applying-patches-to-root-package-root-project-folder) in usage docs section.
 </small>
 
 ### Some feature hilights
