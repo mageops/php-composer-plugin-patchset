@@ -38,9 +38,8 @@ It's (kind-of) an alternative to two other great plugins (differences will becom
 | Choose application method (git/patch) per patch           | yes                                       | TBD                            | TBD                                 |
 | Apply patches to root package/directory                   | yes                                       | no                             | TBD                                 |
 
-<small>
-    <sup>1</sup> Root package patching is the exception, please see [applying patches to root package](docs/usage.md#applying-patches-to-root-package-root-project-folder) in usage docs.
-</small>
+_<sup>1</sup> Root package patching is the exception, please see [applying patches to root package](docs/usage.md#applying-patches-to-root-package-root-project-folder) in usage docs._
+
 
 ### Some feature hilights
 
