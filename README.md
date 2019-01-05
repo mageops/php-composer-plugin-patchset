@@ -16,6 +16,8 @@ It's (kind-of) an alternative to two other great plugins (differences will becom
  * [cweagans/composer-patches](https://github.com/cweagans/composer-patches)
  
  
+**If you're already convinced skip to [Usage Documentation](docs/usage.md).**
+ 
 ## Feature comparison table
 
 | Feature                                                   | creativestyle/composer-plugin-patchset    | cweagans/composer-patches 1.x  | netresearch/composer-patches-plugin |
@@ -33,15 +35,8 @@ It's (kind-of) an alternative to two other great plugins (differences will becom
 | Apply patches to root package/directory                   | yes                                       | no                             | TBD                                 |
 
 <small>
-    <sup>1</sup> Root package patching is the exception, please see [applying patches to root package](Applying patches to root package (root project folder)) in usage docs section.
+    <sup>1</sup> Root package patching is the exception, please see [applying patches to root package](docs/usage.md#applying-patches-to-root-package-root-project-folder) in usage docs.
 </small>
-
-
-Test2: [applying patches to root package](#sth)
-
-Test1: [applying patches to root package](Applying patches to root package (root project folder))
-
-
 
 ### Some feature hilights
 
@@ -90,28 +85,6 @@ plugins have done their work so patching source files in vendor will have no eff
  Also you will not be able to specify patches in any composer package. You have to use a dedicated packages for this 
  purpose. I can hardly imagine a legit use case when it would be desirable that installing package X will automatically 
  patch some other package Y in your project without explicitly being advertised as a patchset.
-
-## Usage
-
-### Create *patchset* composer package
-
-### Define patches in your root package
-
-### Applying patches to root package (root project folder)
-
-Define patches as you normally would. If your root package is not named the you should use special
-`__root__` as package name.
-
-**CAUTION** Since root package cannot be reinstalled once patches are applied they cannot be removed!
-This means that if you want to remove patches applied to root package you should reinstall the whole
-project manually. The plugin will warn you when this is the case but will not fail. It will try
-to apply any new root package patches though.
-
-__New patches will be applied to the root package but then _application order_ is not guaranteed.__
-
-### Options
-
-#### Strip defined number of components when applying patch (`-pX`)
 
 ## Running tests
 
