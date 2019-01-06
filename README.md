@@ -7,7 +7,7 @@ This plugin can automatically apply patches to any dependency of your project.
 
 One of the most distinguishing features is that it can apply patches from special composer packages of type `patchset`.
 This is quite convenient as you can store all your patches in one repository and apply them automatically on all
-systems including developer's machines in a very predictable way. Also you can easily distribute your patchset to the
+systems including developers' machines in a very predictable way. Also you can easily distribute your patchset to the
 whole community via packagist.
 
 It's (kind-of) an alternative to two other great plugins (differences will become apparent once you read __Features__):
