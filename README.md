@@ -10,13 +10,12 @@ This is quite convenient as you can store all your patches in one repository and
 systems including developers' machines in a very predictable way. Also you can easily distribute your patchset to the
 whole community via packagist.
 
-It's (kind-of) an alternative to two other great plugins (differences will become apparent once you read __Features__):
+It's (kind-of) an alternative to two other great plugins:
      
  * [netresearch/composer-patches-plugin](https://github.com/netresearch/composer-patches-plugin)
  * [cweagans/composer-patches](https://github.com/cweagans/composer-patches)
  
- 
-**Continue reading this document for general description or skip to:**
+**Continue reading this document for more in-depth description or skip to right away:**
 
  * [Usage Documentation](docs/usage.md)
  * [Creating Patches Howto](docs/creating-patches.md)
