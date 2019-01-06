@@ -41,7 +41,7 @@ It's (kind-of) an alternative to two other great plugins (differences will becom
 _<sup>1</sup> Root package patching is the exception, please see [applying patches to root package](docs/usage.md#applying-patches-to-root-package-root-project-folder) in usage docs._
 
 
-### Some feature hilights
+## Feature description
 
  - Apply patches from dedicated composer packages (package your patchset!).
  - Each patch can have a version constraint (composer semver) checked against the target package.
@@ -63,7 +63,19 @@ _<sup>1</sup> Root package patching is the exception, please see [applying patch
    
    Double composer update/install for build is not necessary.
    
-### Chicken or egg problem
+## Use Git for applying patches
+
+By default the library will try to use the `patch` command if not available and fall back to `git` otherwise.
+You can force using git for each patch (see: [Usage Documentation](docs/usage.md)).
+
+There were some problems using `git apply` reported in other plugins for packages that were not installed
+as source (did not have a git repo; `.git` dir). I was not able to reproduce this problem with git 2.X - however -
+a workaround for this potential problem has been implemented:
+
+    - If the target package has `.git` directory, then the patches are applied relative to target package root
+    - If no git repo in target package then patches are applied from root project directory
+   
+## Chicken or egg problem
 
 Patching via composer plugin has one big problem - you cannot catch all events on the first install.
 Furthermore applying patches on package install/remove is very error prone as you can never predict
@@ -79,7 +91,7 @@ of your project then you should patch the root package because the patch applica
 plugins have done their work so patching source files in vendor will have no effect.**
 
 
-### No remote patches
+## Why no remote patches
 
  This plugin will not download patches from external sources directly (http). I consider this a bad practice and will
  never support it. I won't even comment on downloading patches using unencrypted connection without SHA check. Also what

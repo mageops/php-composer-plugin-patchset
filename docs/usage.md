@@ -56,7 +56,7 @@ _Use this way to easily distribute your patchset and use it in multiple projects
 
 ## Define patches in your root package
 
-# Composer json configuration reference 
+# JSON configuration reference 
 
 ## Patch properties
 
@@ -84,6 +84,15 @@ This has the same effect as the `-p{x}` switch of the patch command, where `{x}`
 
 For 99% of the patches this will be the default `1`. Set this only if your patch was generated in some non-standard way.
 
+### `method` (string, default: `"patch"`)
+
+There are two methods of application: `patch` and `git`.
+
+By default the library will attempt to use the `patch` binary and fall back to `git apply` if not available.
+
+If you want to force using `git apply` for patches that are compatible only with `git` you can do so
+with this parameter on patch level.
+
 # Notable use-cases
 
 ## Applying patches to root package (root project folder)
@@ -97,3 +106,4 @@ project manually. The plugin will warn you when this is the case but will not fa
 to apply any new root package patches though.
 
 __New patches will be applied to the root package but then _application order_ is not guaranteed.__
+
