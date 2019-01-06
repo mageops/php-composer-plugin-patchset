@@ -56,27 +56,31 @@ _Use this way to easily distribute your patchset and use it in multiple projects
 
 ## Define patches in your root package
 
+Apart from defining patches in a `patchset` type package, you can also do that in your main `composer.json`.
+
+Just add the `"extra": {"patchset": {}}` configuration the same way as in a patchset package.
+
 # JSON configuration reference 
 
 ## Patch properties
 
-### `description` (string, mandatory)
+#### `description` (string, mandatory)
 
 Short description (or name) of your patch. Keep it short as it will be displayed during patching.
 
-### `filename` (string, mandatory)
+#### `filename` (string, mandatory)
 
 Path to your diff file relative to the root of your patchset. Patches can be stored anywhere within
 the package.
 
-### `version-constraint` (string, default: `"*"`)
+#### `version-constraint` (string, default: `"*"`)
 
 A composer semver version constraint. If specified then the patch application will be attempted 
 only if the target package's version matches the constraint.
 
 See [composer documenation](https://getcomposer.org/doc/articles/versions.md) for exact syntax reference.
 
-### `strip-path-components` (integer, default: `1`)
+#### `strip-path-components` (integer, default: `1`)
 
 How many leading path components to strip from filenames in diff when applying the patch.
 
@@ -84,7 +88,7 @@ This has the same effect as the `-p{x}` switch of the patch command, where `{x}`
 
 For 99% of the patches this will be the default `1`. Set this only if your patch was generated in some non-standard way.
 
-### `method` (string, default: `"patch"`)
+#### `method` (string, default: `"patch"`)
 
 There are two methods of application: `patch` and `git`.
 
