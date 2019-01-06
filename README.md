@@ -15,7 +15,7 @@ It's (kind-of) an alternative to two other great plugins:
  * [netresearch/composer-patches-plugin](https://github.com/netresearch/composer-patches-plugin)
  * [cweagans/composer-patches](https://github.com/cweagans/composer-patches)
  
-**Continue reading this document for more in-depth description or skip to right away:**
+**Continue reading this document for more in-depth description or skip right away directly to:**
 
  * [Usage Documentation](docs/usage.md)
  * [Creating Patches Howto](docs/creating-patches.md)
