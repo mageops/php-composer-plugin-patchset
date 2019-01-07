@@ -112,7 +112,7 @@ class PatchApplicator
         $cwd = null;
 
         if ($method === self::METHOD_PATCH && $this->hasPatchCommand()) {
-            $cmd = ['patch', '--posix', '--strip=' . $stripPathComponents, '--input='.$patchFile,  '--directory='.$targetDirectory];
+            $cmd = ['patch', '--posix', '--batch', '--strip=' . $stripPathComponents, '--input='.$patchFile,  '--directory='.$targetDirectory];
         } else {
             $cmd = ['git', 'apply', '-v', '-p' . $stripPathComponents, $patchFile];
 
