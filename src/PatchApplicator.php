@@ -126,7 +126,7 @@ class PatchApplicator
         $cwd = null;
 
         if ($method === self::METHOD_PATCH && $this->hasPatchCommand()) {
-            $cmd = ['patch', '--posix', '--batch', '--strip=' . $stripPathComponents, '--input='.$patchFile,  '--directory='.$targetDirectory];
+            $cmd = ['patch', '--posix', '--batch', '--forward', '--strip=' . $stripPathComponents, '--input='.$patchFile,  '--directory='.$targetDirectory];
         } else {
             $cmd = ['git', 'apply', '-v', '-p' . $stripPathComponents, $patchFile];
 
@@ -159,6 +159,14 @@ class PatchApplicator
         $patchFilename = $this->pathResolver->getPatchSourceFilePath($sourcePackage, $patch);
 
         if (!$this->executePatchCommand($patch->getMethod(), $targetDirectory, $patchFilename, $patch->getStripPathComponents())) {
+            $this->logger->notice(sprintf('<error>Failed to apply patch</error> <info>%s:%s</info> [<comment>%s</comment>] (<comment>%s</comment>) using <comment>%s</comment> method',
+                $patch->getSourcePackage(),
+                $patch->getFilename(),
+                $patch->getVersionConstraint(),
+                $patch->getDescription(),
+                $patch->getMethod()
+            ));
+
             throw new PatchApplicationFailedException($this->lastCmd, $this->lastCmdOutput);
         }
 
