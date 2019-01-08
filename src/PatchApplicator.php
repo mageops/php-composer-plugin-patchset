@@ -159,7 +159,7 @@ class PatchApplicator
         $patchFilename = $this->pathResolver->getPatchSourceFilePath($sourcePackage, $patch);
 
         if (!$this->executePatchCommand($patch->getMethod(), $targetDirectory, $patchFilename, $patch->getStripPathComponents())) {
-            throw new PatchApplicationFailedException($patchFilename, $this->lastCmdOutput);
+            throw new PatchApplicationFailedException($this->lastCmd, $this->lastCmdOutput);
         }
 
         $this->logger->notice(sprintf('Applied patch <info>%s:%s</info> [<comment>%s</comment>] (<comment>%s</comment>) using <comment>%s</comment> method',
