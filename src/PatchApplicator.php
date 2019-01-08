@@ -7,6 +7,7 @@ use Composer\Package\PackageInterface;
 use Composer\Util\Filesystem;
 use Composer\Util\ProcessExecutor;
 
+use Creativestyle\Composer\Patchset\Exception\PatchApplicationFailedException;
 use Psr\Log\LoggerInterface;
 
 class PatchApplicator
@@ -47,7 +48,12 @@ class PatchApplicator
     /**
      * @var string
      */
-    private $cmdErr;
+    private $lastCmd;
+
+    /**
+     * @var string
+     */
+    private $lastCmdOutput;
 
     /**
      * @var Filesystem
@@ -82,8 +88,16 @@ class PatchApplicator
             $cmd = $cmd[0] . ' ' .implode(' ', array_map([ProcessExecutor::class, 'escape'], array_slice($cmd, 1)));
         }
 
-        $returnCode = $this->executor->execute($cmd, $output, $cwd);
-        $this->cmdErr = $this->executor->getErrorOutput();
+        $output = '';
+
+        $outputHandler = function($type, $buffer) use (&$output) {
+            $output .= $buffer;
+        };
+
+        $returnCode = $this->executor->execute($cmd, $outputHandler, $cwd);
+
+        $this->lastCmd = $cmd;
+        $this->lastCmdOutput = $output;
 
         return $returnCode;
     }
@@ -145,7 +159,7 @@ class PatchApplicator
         $patchFilename = $this->pathResolver->getPatchSourceFilePath($sourcePackage, $patch);
 
         if (!$this->executePatchCommand($patch->getMethod(), $targetDirectory, $patchFilename, $patch->getStripPathComponents())) {
-            throw new \RuntimeException('Could not apply patch: ' . $this->cmdErr);
+            throw new PatchApplicationFailedException($patchFilename, $this->lastCmdOutput);
         }
 
         $this->logger->notice(sprintf('Applied patch <info>%s:%s</info> [<comment>%s</comment>] (<comment>%s</comment>) using <comment>%s</comment> method',

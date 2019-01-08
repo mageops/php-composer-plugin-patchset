@@ -11,6 +11,7 @@ use Composer\Package\RootPackageInterface;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\RepositoryManager;
 use Composer\Util\ProcessExecutor;
+use Creativestyle\Composer\Patchset\Exception\PatchApplicationFailedException;
 use Psr\Log\LoggerInterface;
 
 class Patcher
@@ -290,15 +291,39 @@ class Patcher
                 $packagePatchApplication->getTargetPackage()->getPrettyVersion()
             ));
 
+            /** @var PatchApplicationFailedException|null $applicationFailedException */
+            $applicationFailedException = null;
+            
+            /** @var PatchApplication[] $processedPatchApplications */
+            $processedPatchApplications = [];
+
             foreach ($packagePatchApplication->getApplications() as $patchApplication) {
-                $this->applicator->applyPatch(
-                    $patchApplication->getPatch(),
-                    $patchApplication->getSourcePackage(),
-                    $patchApplication->getTargetPackage()
-                );
+                try {
+                    $this->applicator->applyPatch(
+                        $patchApplication->getPatch(),
+                        $patchApplication->getSourcePackage(),
+                        $patchApplication->getTargetPackage()
+                    );
+                } catch (PatchApplicationFailedException $exception) {
+                    // Break out of the loop to save current state (already applied patches).
+                    $applicationFailedException = $exception;
+                    break;
+                }
+
+                $processedPatchApplications[] = $patchApplication;
             }
 
-            $this->packageApplicationRepository->savePackageApplication($packagePatchApplication);
+            $this->packageApplicationRepository->savePackageApplication(
+                new PackagePatchApplication(
+                    $packagePatchApplication->getTargetPackage(),
+                    $processedPatchApplications
+                )
+            );
+
+            if ($applicationFailedException) {
+                // We still rethrow the exception after handling it gracefully
+                throw $applicationFailedException;
+            }
         }
     }
 
