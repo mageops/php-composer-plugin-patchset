@@ -226,6 +226,10 @@ class Patcher
                 }
             }
 
+            if (empty($applications)) {
+                continue;
+            }
+
             $applications = array_values($applications);
 
             $packageApplications[$targetPackage->getName()] = new PackagePatchApplication($targetPackage, $applications);
