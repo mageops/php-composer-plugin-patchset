@@ -97,6 +97,16 @@ By default the library will attempt to use the `patch` binary and fall back to `
 If you want to force using `git apply` for patches that are compatible only with `git` you can do so
 with this parameter on patch level.
 
+#### `keep-empty-files` (bool, default: `false`)
+
+_Warning!_ This setting has effect only when using the `patch` method.
+
+By default the empty files will be removed by passing `--remove-empty-files` switch to the `patch` command.
+
+This allows to create patches which remove files.
+
+If you want to override this behaviour per-patch set this parameter to `true`.
+
 # Notable use-cases
 
 ## Applying patches to root package (root project folder)
