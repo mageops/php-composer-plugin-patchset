@@ -54,6 +54,11 @@ class Patch
     private $method = PatchApplicator::METHOD_PATCH;
 
     /**
+     * @var bool
+     */
+    private $keepEmptyFiles;
+
+    /**
      * @param $sourcePackage
      * @param string $targetPackage
      * @param string $versionConstraint
@@ -61,6 +66,7 @@ class Patch
      * @param string $description
      * @param int $stripPathComponents
      * @param string $method
+     * @param bool $keepEmptyFiles
      */
     public function __construct(
         $sourcePackage,
@@ -69,7 +75,8 @@ class Patch
         $filename,
         $description,
         $stripPathComponents = 1,
-        $method = PatchApplicator::METHOD_PATCH
+        $method = PatchApplicator::METHOD_PATCH,
+        $keepEmptyFiles = false
     ) {
         $this->sourcePackage = $sourcePackage;
         $this->targetPackage = $targetPackage;
@@ -78,6 +85,7 @@ class Patch
         $this->description = $description;
         $this->stripPathComponents = $stripPathComponents;
         $this->method = $method;
+        $this->keepEmptyFiles = $keepEmptyFiles;
     }
 
     /**
@@ -92,7 +100,8 @@ class Patch
             'version-constraint' => '*',
             'description' => null,
             'strip-path-components' => 1,
-            'method' => PatchApplicator::METHOD_PATCH
+            'method' => PatchApplicator::METHOD_PATCH,
+            'keep-empty-files' => false,
         ], $config);
 
         if (!in_array($config['method'], PatchApplicator::METHODS)) {
@@ -110,7 +119,8 @@ class Patch
             $config['filename'],
             $config['description'],
             $config['strip-path-components'],
-            $config['method']
+            $config['method'],
+            $config['keep-empty-files']
         );
     }
 
@@ -124,7 +134,8 @@ class Patch
             $data['filename'],
             $data['description'],
             $data['strip_path_components'],
-            $data['method']
+            $data['method'],
+            $data['keep_empty_files']
         );
     }
 
@@ -194,6 +205,14 @@ class Patch
     }
 
     /**
+     * @return bool
+     */
+    public function getKeepEmptyFiles()
+    {
+        return $this->keepEmptyFiles;
+    }
+
+    /**
      * @return string
      */
     public function getMethod()
@@ -210,7 +229,8 @@ class Patch
             'filename' => $this->filename,
             'description' => $this->description,
             'strip_path_components' => $this->stripPathComponents,
-            'method' => $this->method
+            'method' => $this->method,
+            'keep_empty_files' => $this->keepEmptyFiles,
         ];
     }
 }

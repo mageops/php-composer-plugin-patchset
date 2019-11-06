@@ -119,14 +119,20 @@ class PatchApplicator
      * @param string $targetDirectory
      * @param string $patchFile
      * @param int $stripPathComponents
+     * @param bool $keepEmptyFiles
      * @return bool
      */
-    private function executePatchCommand($method, $targetDirectory, $patchFile, $stripPathComponents)
+    private function executePatchCommand($method, $targetDirectory, $patchFile, $stripPathComponents, $keepEmptyFiles = false)
     {
         $cwd = null;
 
         if ($method === self::METHOD_PATCH && $this->hasPatchCommand()) {
             $cmd = ['patch', '--posix', '--batch', '--forward', '--strip=' . $stripPathComponents, '--input='.$patchFile,  '--directory='.$targetDirectory];
+
+            if (!$keepEmptyFiles) {
+                $cmd[] = '--remove-empty-files';
+            }
+
         } else {
             $cmd = ['git', 'apply', '-v', '-p' . $stripPathComponents, $patchFile];
 
