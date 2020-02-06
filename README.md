@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/mageops/composer-plugin-patchset.svg?branch=master)](https://travis-ci.org/mageops/composer-plugin-patchset)
+[![Build Status](https://travis-ci.org/mageops/php-composer-plugin-patchset.svg?branch=master)](https://travis-ci.org/mageops/php-composer-plugin-patchset)
 
 Composer Plugin For Applying Patchsets
 ======================================
