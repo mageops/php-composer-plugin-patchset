@@ -1,0 +1,14 @@
+new file mode 100755
+--- /dev/null
++++ b/file-added-by-patch.md
+@@ -0,0 +1,8 @@
++# This file has been created by patch
++
++*The `--posix` switch for `--patch` command disables support
++ for new file creation causing patch application failure.*
++
++ This feature is supported out-of-the-box with git patching
++ and relatively widely used so should be supported.
++
+
+ 

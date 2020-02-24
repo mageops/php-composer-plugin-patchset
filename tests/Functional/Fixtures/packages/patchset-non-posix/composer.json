@@ -1,0 +1,19 @@
+{
+    "name": "test/patchset-non-posix",
+    "type": "patchset",
+    "version": "1.3",
+    "description": "Tests non-posix compatible patches",
+    "require": {
+        "creativestyle/composer-plugin-patchset": "dev-master"
+    },
+    "extra": {
+        "patchset": {
+            "test/package-a": [
+                {
+                    "description": "Create new file",
+                    "filename": "patches/new-file-patch.diff"
+                }            
+            ]
+        }
+    }
+}

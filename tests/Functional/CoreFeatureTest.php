@@ -16,6 +16,10 @@ class CoreFeatureTest extends SandboxTestCase
         ]
     ];
 
+    const PACKAGEA_NON_POSIX_PATCHSET_APPLICATIONS = [
+        '/vendor/test/package-a/file-added-by-patch.md' => 'This file has been created by patch'
+    ];
+
     const ROOT_PACKAGE_APPLICATIONS = [
         '/src/root-code.php' => '-is-patched'
     ];
@@ -267,5 +271,20 @@ class CoreFeatureTest extends SandboxTestCase
 
         $this->assertContains('using git method', $installRun->getFullOutput(), 'patches were applied using git', true);
         $this->assertNotContains('using patch method', $installRun->getFullOutput(), 'no patches were applied using patch command', true);
+    }
+
+    public function testPatchesCanCreateNewFiles()
+    {
+        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+            'require' => [
+                'test/patchset-non-posix'=> '~1.0',
+                'test/package-a'=> 'dev-master',
+                'creativestyle/composer-plugin-patchset'=> 'dev-master'
+            ]
+        ]);
+
+        $run = $project->runComposerCommand('install');
+
+        $this->assertThatComposerRunHasAppliedPatches($run, self::PACKAGEA_NON_POSIX_PATCHSET_APPLICATIONS);
     }
 }
