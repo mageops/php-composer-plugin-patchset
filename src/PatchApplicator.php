@@ -127,7 +127,7 @@ class PatchApplicator
         $cwd = null;
 
         if ($method === self::METHOD_PATCH && $this->hasPatchCommand()) {
-            $cmd = ['patch', '--posix', '--batch', '--forward', '--strip=' . $stripPathComponents, '--input='.$patchFile,  '--directory='.$targetDirectory];
+            $cmd = ['patch', '--batch', '--forward', '--strip=' . $stripPathComponents, '--input='.$patchFile,  '--directory='.$targetDirectory];
 
             if (!$keepEmptyFiles) {
                 $cmd[] = '--remove-empty-files';
