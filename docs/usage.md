@@ -29,7 +29,7 @@ _Use this way to easily distribute your patchset and use it in multiple projects
         "type": "patchset",
         "version": "1.0",
         "require": {
-            "creativestyle/composer-plugin-patchset": "^1.0"
+            "creativestyle/composer-plugin-patchset": "^2.0"
         },
         "extra": {
             "patchset": {
