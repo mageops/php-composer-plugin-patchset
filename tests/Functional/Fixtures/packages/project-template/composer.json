@@ -1,7 +1,0 @@
-{
-    "name": "test/project-template",
-    "type": "project",
-    "version": "dev-master",
-    "require": {},
-    "minimum-stability": "dev"
-}

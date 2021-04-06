@@ -3,7 +3,7 @@
     "type": "patchset",
     "version": "1.0",
     "require": {
-        "creativestyle/composer-plugin-patchset": "dev-master"
+        "creativestyle/composer-plugin-patchset": "@stable"
     },
     "extra": {
         "patchset": {

@@ -1,0 +1,8 @@
+#!/usr/bin/env php
+<?php
+
+include __DIR__ . '/../vendor/autoload.php';
+
+use Pinkeen\ComposerPharInstaller\ComposerPharInstaller;
+
+ComposerPharInstaller::passthru();

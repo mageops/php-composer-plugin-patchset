@@ -2,7 +2,10 @@
 
 namespace Creativestyle\Composer\Patchset\Tests\Functional;
 
-class CoreFeatureTest extends SandboxTestCase
+use Creativestyle\Composer\TestingSandbox\ComposerSandbox;
+use Creativestyle\Composer\TestingSandbox\ComposerSandboxTestCase;
+
+class CoreFeatureTest extends ComposerSandboxTestCase
 {
     const PACKAGEA_PATCH1_APPLICATIONS = [
         '/vendor/test/package-a/src/test.php' => 'patched-in-echo'
@@ -26,64 +29,64 @@ class CoreFeatureTest extends SandboxTestCase
 
     public function testSimplePatchingDuringFirstInstallWorks()
     {
-        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+        $project = $this->createComposerSandboxProject('test/project-template', '*', [
             'require' => [
-                'test/patchset'=> '~1.0',
-                'test/package-a'=> 'dev-master',
-                'creativestyle/composer-plugin-patchset'=> 'dev-master'
+                'test/patchset' => '~1.0',
+                'test/package-a' => '@dev',
+                'creativestyle/composer-plugin-patchset' => ComposerSandbox::getSelfPackageVersion()
             ]
         ]);
 
         $run = $project->runComposerCommand('install');
 
-        $this->assertThatComposerRunHasAppliedPatches($run, self::PACKAGEA_PATCH1_APPLICATIONS);
+        $this->assertThatComposerCommandResultHasAppliedPatches($run, self::PACKAGEA_PATCH1_APPLICATIONS);
     }
 
     public function testPatchingPluginIsInstalledAndExecutedWhenPulledAsPatchsetDependency()
     {
-        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+        $project = $this->createComposerSandboxProject('test/project-template', '*', [
             'require' => [
-                'test/patchset'=> '~1.0',
-                'test/package-a'=> 'dev-master',
+                'test/patchset' => '~1.0',
+                'test/package-a' => '@dev',
             ]
         ]);
 
-        $run = $project->runComposerCommand('install');
+        $run = $project->runComposerCommand('update');
 
-        $this->assertThatComposerRunHasAppliedPatches($run, self::PACKAGEA_PATCH1_APPLICATIONS);
+        $this->assertThatComposerCommandResultHasAppliedPatches($run, self::PACKAGEA_PATCH1_APPLICATIONS);
     }
 
     public function testPatchesAreAppliedWhenPackageIsAddedToExistingProject()
     {
-        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+        $project = $this->createComposerSandboxProject('test/project-template', '*', [
             'require' => [
-                'test/patchset'=> '~1.0',
+                'test/patchset' => '~1.0',
             ]
         ]);
 
         $installRun = $project->runComposerCommand('install');
 
-        $this->assertThatComposerRunWasSuccessful($installRun);
+        $this->assertThatComposerCommandResultWasSuccessful($installRun);
 
         // At this point nothing to patch so no patches shall be applied
-        $requireRun = $project->runComposerCommand('require', 'test/package-a', 'dev-master');
+        $requireRun = $project->runComposerCommand('require', 'test/package-a', '*');
 
-        $this->assertThatComposerRunHasAppliedPatches($requireRun, self::PACKAGEA_PATCH1_APPLICATIONS);
+        $this->assertThatComposerCommandResultHasAppliedPatches($requireRun, self::PACKAGEA_PATCH1_APPLICATIONS);
     }
 
     public function testPatchesAreNotReappliedOnUpdate()
     {
-        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+        $project = $this->createComposerSandboxProject('test/project-template', '*', [
             'require' => [
-                'test/patchset'=> '~1.0',
-                'test/package-a'=> 'dev-master',
-                'creativestyle/composer-plugin-patchset'=> 'dev-master'
+                'test/patchset' => '~1.0',
+                'test/package-a' => '@dev',
+                'creativestyle/composer-plugin-patchset' => ComposerSandbox::getSelfPackageVersion()
             ]
         ]);
 
         $installRun = $project->runComposerCommand('install');
 
-        $this->assertThatComposerRunHasAppliedPatches($installRun, self::PACKAGEA_PATCH1_APPLICATIONS);
+        $this->assertThatComposerCommandResultHasAppliedPatches($installRun, self::PACKAGEA_PATCH1_APPLICATIONS);
 
         $updateRun = $project->runComposerCommand('update');
 
@@ -93,17 +96,17 @@ class CoreFeatureTest extends SandboxTestCase
 
     public function testLayeredPatchesAreAppliedInCorrectOrder()
     {
-        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+        $project = $this->createComposerSandboxProject('test/project-template', '*', [
             'require' => [
-                'test/patchset-extra'=> '~1.0',
-                'test/package-a'=> 'dev-master',
-                'creativestyle/composer-plugin-patchset'=> 'dev-master'
+                'test/patchset-extra' => '~1.0',
+                'test/package-a' => '@dev',
+                'creativestyle/composer-plugin-patchset' => ComposerSandbox::getSelfPackageVersion()
             ]
         ]);
 
         $installRun = $project->runComposerCommand('install');
 
-        $this->assertThatComposerRunHasAppliedPatches($installRun,
+        $this->assertThatComposerCommandResultHasAppliedPatches($installRun,
             array_merge_recursive(
                 self::PACKAGEA_PATCH1_APPLICATIONS,
                 self::PACKAGEA_PATCH2_APPLICATIONS
@@ -120,18 +123,18 @@ class CoreFeatureTest extends SandboxTestCase
     {
         // Same patch coming from multiple patchsets shall be applied only once
 
-        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+        $project = $this->createComposerSandboxProject('test/project-template', '*', [
             'require' => [
-                'test/patchset'=> '~1.0',
-                'test/patchset-extra'=> '~1.0',
-                'test/package-a'=> 'dev-master',
-                'creativestyle/composer-plugin-patchset'=> 'dev-master'
+                'test/patchset' => '~1.0',
+                'test/patchset-extra' => '~1.0',
+                'test/package-a' => '@dev',
+                'creativestyle/composer-plugin-patchset' => ComposerSandbox::getSelfPackageVersion()
             ]
         ]);
 
-        $installRun = $project->runComposerCommand('install');
+        $installRun = $project->runComposerCommand('update');
 
-        $this->assertThatComposerRunHasAppliedPatches($installRun,
+        $this->assertThatComposerCommandResultHasAppliedPatches($installRun,
             array_merge_recursive(
                 self::PACKAGEA_PATCH1_APPLICATIONS,
                 self::PACKAGEA_PATCH2_APPLICATIONS
@@ -143,18 +146,18 @@ class CoreFeatureTest extends SandboxTestCase
     {
         // Same patch coming from multiple patchsets shall be applied only once
 
-        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+        $project = $this->createComposerSandboxProject('test/project-template', '*', [
             'require' => [
-                'test/patchset'=> '~1.0',
-                'test/patchset-extra'=> '~1.0',
-                'test/package-a'=> 'dev-master',
-                'creativestyle/composer-plugin-patchset'=> 'dev-master'
+                'test/patchset' => '~1.0',
+                'test/patchset-extra' => '~1.0',
+                'test/package-a' => '@dev',
+                'creativestyle/composer-plugin-patchset' => ComposerSandbox::getSelfPackageVersion()
             ]
         ]);
 
-        $installRun = $project->runComposerCommand('install');
+        $installRun = $project->runComposerCommand('update');
 
-        $this->assertThatComposerRunHasAppliedPatches($installRun,
+        $this->assertThatComposerCommandResultHasAppliedPatches($installRun,
             array_merge_recursive(
                 self::PACKAGEA_PATCH1_APPLICATIONS,
                 self::PACKAGEA_PATCH2_APPLICATIONS
@@ -166,7 +169,7 @@ class CoreFeatureTest extends SandboxTestCase
         $this->assertContains('Reinstalling test/package-a', $removeRun->getFullOutput(), 'test/package-a has been reinstalled', true);
 
         // First patch is coming from the first patchset so it still should be applied
-        $this->assertThatComposerRunHasAppliedPatches($removeRun,
+        $this->assertThatComposerCommandResultHasAppliedPatches($removeRun,
             self::PACKAGEA_PATCH1_APPLICATIONS,
             self::PACKAGEA_PATCH2_APPLICATIONS
         );
@@ -174,23 +177,23 @@ class CoreFeatureTest extends SandboxTestCase
 
     public function testRootPackageCanBePatched()
     {
-        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+        $project = $this->createComposerSandboxProject('test/project-template', '*', [
             'require' => [
-                'test/patchset-root'=> '~1.0',
+                'test/patchset-root' => '~1.0',
             ]
         ]);
 
-        $installRun = $project->runComposerCommand('install');
+        $installRun = $project->runComposerCommand('update');
 
-        $this->assertThatComposerRunHasAppliedPatches($installRun, self::ROOT_PACKAGE_APPLICATIONS);
+        $this->assertThatComposerCommandResultHasAppliedPatches($installRun, self::ROOT_PACKAGE_APPLICATIONS);
     }
 
     public function testRootCanDefinePatches()
     {
-        $project = $this->getSandbox()->createProjectSandBox('test/project-template-patchset', 'dev-master', [
+        $project = $this->createComposerSandboxProject('test/project-template-patchset', '*', [
             'require' => [
-                'test/package-a'=> 'dev-master',
-                'creativestyle/composer-plugin-patchset'=> 'dev-master'
+                'test/package-a' => '@dev',
+                'creativestyle/composer-plugin-patchset' => ComposerSandbox::getSelfPackageVersion()
             ],
             'extra' => [
                 'patchset' => [
@@ -204,16 +207,16 @@ class CoreFeatureTest extends SandboxTestCase
             ]
         ]);
 
-        $installRun = $project->runComposerCommand('install');
-        $this->assertThatComposerRunHasAppliedPatches($installRun, self::PACKAGEA_PATCH1_APPLICATIONS);
+        $installRun = $project->runComposerCommand('update');
+        $this->assertThatComposerCommandResultHasAppliedPatches($installRun, self::PACKAGEA_PATCH1_APPLICATIONS);
     }
 
     public function testRootCanPatchItself()
     {
-        $project = $this->getSandbox()->createProjectSandBox('test/project-template-patchset', 'dev-master', [
+        $project = $this->createComposerSandboxProject('test/project-template-patchset', '*', [
             'require' => [
-                'test/package-a'=> 'dev-master',
-                'creativestyle/composer-plugin-patchset'=> 'dev-master'
+                'test/package-a' => '@dev',
+                'creativestyle/composer-plugin-patchset' => ComposerSandbox::getSelfPackageVersion()
             ],
             'extra' => [
                 'patchset' => [
@@ -227,22 +230,22 @@ class CoreFeatureTest extends SandboxTestCase
             ]
         ]);
 
-        $installRun = $project->runComposerCommand('install');
-        $this->assertThatComposerRunHasAppliedPatches($installRun, self::ROOT_PACKAGE_APPLICATIONS);
+        $installRun = $project->runComposerCommand('update');
+        $this->assertThatComposerCommandResultHasAppliedPatches($installRun, self::ROOT_PACKAGE_APPLICATIONS);
     }
 
     public function testArbitraryNumberOfPathComponentsCanBeStripped()
     {
-        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+        $project = $this->createComposerSandboxProject('test/project-template', '*', [
             'require' => [
                 'test/patchset' => '2.0',
-                'test/package-a' => 'dev-master',
+                'test/package-a' => '@dev',
             ]
         ]);
 
-        $installRun = $project->runComposerCommand('install');
+        $installRun = $project->runComposerCommand('update');
 
-        $this->assertThatComposerRunHasAppliedPatches($installRun,
+        $this->assertThatComposerCommandResultHasAppliedPatches($installRun,
             array_merge_recursive(
                 self::PACKAGEA_PATCH1_APPLICATIONS,
                 self::PACKAGEA_PATCH2_APPLICATIONS
@@ -252,16 +255,16 @@ class CoreFeatureTest extends SandboxTestCase
 
     public function testGitApplyCanBeUsedForPatching()
     {
-        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+        $project = $this->createComposerSandboxProject('test/project-template', '*', [
             'require' => [
                 'test/patchset-git' => '1.0',
-                'test/package-a' => 'dev-master',
+                'test/package-a' => '@dev',
             ]
         ]);
 
-        $installRun = $project->runComposerCommand('install');
+        $installRun = $project->runComposerCommand('update');
 
-        $this->assertThatComposerRunHasAppliedPatches($installRun,
+        $this->assertThatComposerCommandResultHasAppliedPatches($installRun,
             array_merge_recursive(
                 self::PACKAGEA_PATCH1_APPLICATIONS,
                 self::PACKAGEA_PATCH2_APPLICATIONS,
@@ -275,16 +278,16 @@ class CoreFeatureTest extends SandboxTestCase
 
     public function testPatchesCanCreateNewFiles()
     {
-        $project = $this->getSandbox()->createProjectSandBox('test/project-template', 'dev-master', [
+        $project = $this->createComposerSandboxProject('test/project-template', '*', [
             'require' => [
-                'test/patchset-non-posix'=> '~1.0',
-                'test/package-a'=> 'dev-master',
-                'creativestyle/composer-plugin-patchset'=> 'dev-master'
+                'test/patchset-non-posix' => '~1.0',
+                'test/package-a' => '@dev',
+                'creativestyle/composer-plugin-patchset' => ComposerSandbox::getSelfPackageVersion()
             ]
         ]);
 
-        $run = $project->runComposerCommand('install');
+        $run = $project->runComposerCommand('update');
 
-        $this->assertThatComposerRunHasAppliedPatches($run, self::PACKAGEA_NON_POSIX_PATCHSET_APPLICATIONS);
+        $this->assertThatComposerCommandResultHasAppliedPatches($run, self::PACKAGEA_NON_POSIX_PATCHSET_APPLICATIONS);
     }
 }

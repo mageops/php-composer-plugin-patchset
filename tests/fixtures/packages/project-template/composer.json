@@ -1,0 +1,8 @@
+{
+    "name": "test/project-template",
+    "type": "project",
+    "version": "1.13.37",
+    "require": {},
+    "minimum-stability": "dev",
+    "prefer-stable": false
+}

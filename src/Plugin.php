@@ -5,12 +5,9 @@ namespace Creativestyle\Composer\Patchset;
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
-use Composer\Package\PackageInterface;
 use Composer\Plugin\PluginInterface;
-use Composer\Repository\ArrayRepository;
 use Composer\Script\ScriptEvents;
 use Composer\Script\Event as ScriptEvent;
-
 use Composer\Util\ProcessExecutor;
 use Psr\Log\LoggerInterface;
 
@@ -36,12 +33,38 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     }
 
     /**
+     * Remove any hooks from Composer
+     *
+     * This will be called when a plugin is deactivated before being
+     * uninstalled, but also before it gets upgraded to a new version
+     * so the old one can be deactivated and the new one activated.
+     *
+     * @param Composer    $composer
+     * @param IOInterface $io
+     */
+    public function deactivate(Composer $composer, IOInterface $io)
+    {
+    }
+
+    /**
+     * Prepare the plugin to be uninstalled
+     *
+     * This will be called after deactivate.
+     *
+     * @param Composer    $composer
+     * @param IOInterface $io
+     */
+    public function uninstall(Composer $composer, IOInterface $io)
+    {
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
         return [
-            ScriptEvents::PRE_AUTOLOAD_DUMP => 'onPreAutoloadDump'
+            ScriptEvents::PRE_AUTOLOAD_DUMP => 'onPreAutoloadDump',
         ];
     }
 

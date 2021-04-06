@@ -1,20 +1,22 @@
 {
-    "name": "test/patchset-extra",
+    "name": "test/patchset",
     "type": "patchset",
-    "version": "1.0",
+    "version": "2.0",
     "require": {
-        "creativestyle/composer-plugin-patchset": "dev-master"
+        "creativestyle/composer-plugin-patchset": "@stable"
     },
     "extra": {
         "patchset": {
             "test/package-a": [
                 {
                     "description": "Patch in echo in the middle",
-                    "filename": "patches/package-a-patch-1.diff"
+                    "filename": "patches/package-a-patch-1-p0.diff",
+                    "strip-path-components": 0
                 },
                 {
                     "description": "Patch in echo at the end",
-                    "filename": "patches/package-a-patch-2.diff"
+                    "filename": "patches/package-a-patch-2-p2.diff",
+                    "strip-path-components": 2
                 }
             ]
         }

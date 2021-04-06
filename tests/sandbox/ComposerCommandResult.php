@@ -1,8 +1,8 @@
 <?php
 
-namespace Creativestyle\Composer\Patchset\Tests\Functional\Fixtures;
+namespace Creativestyle\Composer\TestingSandbox;
 
-class ComposerRun
+class ComposerCommandResult
 {
     /**
      * @var string
@@ -36,12 +36,12 @@ class ComposerRun
      */
     private $composerCommand;
     /**
-     * @var ProjectSandbox
+     * @var ComposerProjectSandbox
      */
     private $project;
 
     /**
-     * @param ProjectSandbox $project
+     * @param ComposerProjectSandbox $project
      * @param string $composerCommand
      * @param string $workingDir
      * @param int $returnCode
@@ -49,7 +49,7 @@ class ComposerRun
      * @param string $stdOut
      * @param string $stdErr
      */
-    public function __construct(ProjectSandbox $project, $composerCommand, $workingDir, $returnCode, $fullOut, $stdOut, $stdErr)
+    public function __construct(ComposerProjectSandbox $project, $composerCommand, $workingDir, $returnCode, $fullOut, $stdOut, $stdErr)
     {
         $this->project = $project;
         $this->composerCommand = $composerCommand;
@@ -143,7 +143,7 @@ class ComposerRun
     }
 
     /**
-     * @return ProjectSandbox
+     * @return ComposerProjectSandbox
      */
     public function getProject()
     {

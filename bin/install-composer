@@ -1,0 +1,34 @@
+#!/usr/bin/env php
+<?php
+
+define('COMPOSER_PHAR_INSTALLER_NO_AUTO_PASSTHRU', 1);
+
+include __DIR__ . '/../tests/installer/ComposerPharInstaller.php';
+
+use Pinkeen\ComposerPharInstaller\ComposerPharInstaller;
+
+if (!$composerVersion = getenv('COMPOSER_VERSION')) {
+    $composerVersion = '2';
+}
+
+
+if (!$tempRootDir = getenv('COMPOSER_SANDBOX_TMPDIR')) {
+    $tempRootDir = sys_get_temp_dir();
+}
+
+$composerPharInstallDir =  $tempRootDir . '/' . uniqid('composer-phar-');
+$composerPharFilename = "composer-v$composerVersion.phar";
+$composerPharFilepath = "$composerPharInstallDir/$composerPharFilename";
+
+if (false === mkdir($composerPharInstallDir, 0775, true)) {
+    fprintf(STDERR, "Could not create composer installation temp dir: %s \n", $composerPharInstallDir);
+    exit(1);
+}
+
+ComposerPharInstaller::setComposerHome($composerPharInstallDir);
+ComposerPharInstaller::mustInstall(
+    $composerVersion, 
+    $composerPharInstallDir,
+    $composerPharFilename,
+    true
+);

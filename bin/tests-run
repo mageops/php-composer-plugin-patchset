@@ -1,0 +1,26 @@
+#!/usr/bin/env php
+<?php
+
+if (!file_exists(__DIR__ . '/../vendor/autoload.php') || getenv('FORCE_PROJECT_INSTALL')) {
+    if (0 !== $code = include(__DIR__ . '/install-project')) {
+        exit($code);
+    }
+}
+
+include_once(__DIR__ . '/install-composer');
+
+putenv("COMPOSER_SANDBOX_COMPOSER=$composerPharFilepath");
+putenv("COMPOSER_SANDBOX_TMPDIR=$tempRootDir");
+
+$phpUnitCmdStr = sprintf('%s --debug --verbose %s',
+    realpath(__DIR__  . '/../vendor/bin/phpunit'), 
+    implode(' ', array_map('escapeshellarg', array_slice($argv, 1)))
+);
+
+
+fprintf(STDOUT, "Running phpunit: %s\n", $phpUnitCmdStr);
+
+passthru($phpUnitCmdStr, $code);
+
+exit($code);
+

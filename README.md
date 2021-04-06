@@ -1,7 +1,9 @@
-[![Build Status](https://travis-ci.org/mageops/php-composer-plugin-patchset.svg?branch=master)](https://travis-ci.org/mageops/php-composer-plugin-patchset)
+[![Build Status](https://travis-ci.com/mageops/php-composer-plugin-patchset.svg?branch=master)](https://travis-ci.com/mageops/php-composer-plugin-patchset)
 
 Composer Plugin For Applying Patchsets
 ======================================
+
+> ‼️ **NEW** Supports both composer branches _v1.x_ and _v2.x_.
 
 This plugin can automatically apply patches to any dependency of your project.
 
@@ -92,13 +94,13 @@ plugins have done their work so patching source files in vendor will have no eff
 
 ## Why no remote patches
 
- This plugin will not download patches from external sources directly (http). I consider this a bad practice and will
- never support it. I won't even comment on downloading patches using unencrypted connection without SHA check. Also what
- if somebody wants to use your software in 2 years and the patches are no longer available?
- 
- Also you will not be able to specify patches in any composer package. You have to use a dedicated packages for this 
- purpose. I can hardly imagine a legit use case when it would be desirable that installing package X will automatically 
- patch some other package Y in your project without explicitly being advertised as a patchset.
+This plugin will not download patches from external sources directly (http). I consider this a bad practice and will
+never support it. I won't even comment on downloading patches using unencrypted connection without SHA check. Also what
+if somebody wants to use your software in 2 years and the patches are no longer available?
+
+Also you will not be able to specify patches in any composer package. You have to use a dedicated packages for this 
+purpose. I can hardly imagine a legit use case when it would be desirable that installing package X will automatically 
+patch some other package Y in your project without explicitly being advertised as a patchset.
 
 
 

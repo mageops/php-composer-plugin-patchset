@@ -1,0 +1,15 @@
+#!/usr/bin/env php
+<?php
+
+include_once(__DIR__ . '/install-composer');
+
+passthru(
+    sprintf(
+        "%s update --working-dir %s --ansi --prefer-dist --no-interaction --optimize-autoloader --no-progress --no-plugins", 
+        escapeshellarg($composerPharFilepath),
+        escapeshellarg(realpath(__DIR__ . '/../'))
+    ), 
+    $code
+);
+
+return $code;
