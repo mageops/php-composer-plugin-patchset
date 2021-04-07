@@ -23,15 +23,6 @@ php:
   - 8.0
   - nightly
 
-jobs:
-  include:
-    # Test PHP 8.0+ only with composer v2 while ignoring platform reqs 
-    # so conflicting dependencies like Symfony polyfills are not installed.
-    - php: 8.0
-      env: COMPOSER_VERSION="2"
-    - php: nightly
-      env: COMPOSER_VERSION="2"
-
 matrix:
   allow_failures:
     - php: nightly

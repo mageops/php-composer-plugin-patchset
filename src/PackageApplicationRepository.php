@@ -101,9 +101,9 @@ class PackageApplicationRepository
             throw new \RuntimeException('Cannot Loaded applied patches data file "%s"', $dataFile);
         }
 
-        $data = json_decode(file_get_contents($dataFile), true);
+        $applicationJson = new JsonFile($dataFile);
 
-        return $this->createPackagePatchApplication($targetPackage, $data);
+        return $this->createPackagePatchApplication($targetPackage, $applicationJson->read());
     }
 
     /**
@@ -122,19 +122,9 @@ class PackageApplicationRepository
             throw new \RuntimeException(sprintf('Package directory is not writable "%s"', dirname($dataFile)));
         }
 
-        file_put_contents($dataFile,
-            $this->encodeData($this->transformPackagePatchApplicationToArray($packagePatchApplication))
-        );
-    }
-
-    /**
-     * @param array $data
-     * @return string
-     */
-    private function encodeData(array $data)
-    {
-        return json_encode($data,
-            JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES + JSON_UNESCAPED_UNICODE
+        $applicationFile = new JsonFile($dataFile);
+        $applicationFile->write(
+            $this->transformPackagePatchApplicationToArray($packagePatchApplication)
         );
     }
 
