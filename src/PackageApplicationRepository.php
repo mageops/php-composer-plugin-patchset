@@ -6,6 +6,10 @@ use Composer\Installer\InstallationManager;
 use Composer\Package\AliasPackage;
 use Composer\Package\PackageInterface;
 use Composer\Repository\RepositoryInterface;
+use Composer\Package\Dumper\ArrayDumper;
+use Composer\Package\Loader\ArrayLoader;
+use Composer\Json\JsonFile;
+use Composer\Semver\Semver;
 use Psr\Log\LoggerInterface;
 
 class PackageApplicationRepository
@@ -31,6 +35,16 @@ class PackageApplicationRepository
     private $logger;
 
     /**
+     * @var ArrayDumper
+     */
+    private $packageDumper;
+
+    /**
+     * @var ArrayLoader
+     */
+    private $packageLoader;
+
+    /**
      * @param RepositoryInterface $installedRepository
      * @param InstallationManager $installationManager
      * @param PathResolver $pathResolver
@@ -46,6 +60,9 @@ class PackageApplicationRepository
         $this->installationManager = $installationManager;
         $this->pathResolver = $pathResolver;
         $this->logger = $logger;
+
+        $this->packageDumper = new ArrayDumper();
+        $this->packageLoader = new ArrayLoader();
     }
 
     /**
@@ -81,7 +98,7 @@ class PackageApplicationRepository
         }
 
         if (!is_readable($dataFile)) {
-            throw new \RuntimeException('Cannot read applied patches data file "%s"', $dataFile);
+            throw new \RuntimeException('Cannot Loaded applied patches data file "%s"', $dataFile);
         }
 
         $data = json_decode(file_get_contents($dataFile), true);
@@ -126,46 +143,104 @@ class PackageApplicationRepository
      * @param array $data
      * @return PackagePatchApplication
      */
-    private function createPackagePatchApplication(PackageInterface $targetPackage, array $data)
+    private function createPackagePatchApplication($targetPackage, array $data)
     {
-        return new PackagePatchApplication($targetPackage,
-            array_map([$this, 'createPatchApplication'], $data['patches'])
-        );
+        return new PackagePatchApplication($targetPackage, array_map(
+            function($patchData) use ($targetPackage) {
+                return $this->createPatchApplication($targetPackage, $patchData);
+            }, 
+            $data['patches']
+        ));
     }
 
     /**
+     * @param PackageInterface|null $loadedPackage
+     * @param string $versionConstraint
+     * @return PackageInterface|null
+     */
+    private function matchLoadedPackageToInstalled($loadedPackage, $versionConstraint = null)
+    {
+        if ($package = $this->installedRepository->findPackage($loadedPackage->getName(), $loadedPackage->getVersion())) {
+            return $package;
+        }
+        
+        if ($loadedPackage->getPrettyVersion() 
+            && $package = $this->installedRepository->findPackage($loadedPackage->getName(), $loadedPackage->getPrettyVersion())) {
+            return $package;
+        }
+
+        if ($loadedPackage->getFullPrettyVersion()
+            && $package = $this->installedRepository->findPackage($loadedPackage->getName(), $loadedPackage->getFullPrettyVersion())) {
+            return $package;
+        }
+
+        if ($versionConstraint && $package = $this->installedRepository->findPackage($loadedPackage->getName(), $versionConstraint)) {
+            return $package;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param PackageInterface $targetPackageInstalled
+     * @param PackageInterface $targetPackageLoaded
+     * @param Patch $patchLoaded
+     * @return PackageInterface|null
+     */
+    private function matchTargetLoadedPackageToInstalled($targetPackageInstalled, $targetPackageLoaded, $patchLoaded)
+    {
+        if ($targetPackageInstalled->getName() === $targetPackageLoaded->getName()) {
+            if ($targetPackageInstalled->getVersion() === $targetPackageLoaded->getVersion()) {
+                return $targetPackageInstalled;
+            }
+
+            if ($targetPackageInstalled->getPrettyVersion() === $targetPackageLoaded->getPrettyVersion()) {
+                return $targetPackageInstalled;
+            }
+
+            if ($patchLoaded->getVersionConstraint() && Semver::satisfies($targetPackageInstalled->getVersion(), $patchLoaded->getVersionConstraint())) {
+                return $targetPackageInstalled;
+            }
+
+            $this->logger->warning(sprintf(
+                'Could not find find installed package (%s) matching version (%s) loaded loaded from applied patch.' .
+                'Name and location checks out, but it might indicate a potential problem. Continuing...',
+                $targetPackageInstalled->getPrettyName(),
+                $targetPackageLoaded->getPrettyName()
+            ));
+        }
+
+        return $this->matchLoadedPackageToInstalled($targetPackageLoaded, $patchLoaded->getVersionConstraint());
+    }
+
+    /**
+     * @param PackageInterface $targetPackage
      * @param array $data
      * @return PatchApplication
      */
-    private function createPatchApplication(array $data)
+    private function createPatchApplication($targetPackage, array $data)
     {
         $patch = Patch::createFromArray($data['patch']);
 
-        $sourcePackage = $this->installedRepository->findPackage(
-            $data['source_package']['name'],
-            $data['source_package']['version']
-        );
+        $sourcePackageLoaded = $this->loadPackageFromArray($data['source_package']);
+        $targetPackageLoaded = $this->loadPackageFromArray($data['target_package']);
 
-        if (!$sourcePackage) {
-            $this->logger->debug(sprintf('Could not find source package %s (%s) for installed patch, it was removed probably',
-                $data['source_package']['name'],
-                $data['source_package']['version']
+        if (!$sourcePackageInstalled = $this->matchLoadedPackageToInstalled($sourcePackageLoaded)) {
+            $this->logger->debug(sprintf(
+                'Could not find source package %s for installed patch, it was removed probably',
+                $sourcePackageLoaded->getPrettyName()
             ));
         }
 
-        $targetPackage = $this->installedRepository->findPackage(
-            $data['target_package']['name'],
-            $data['target_package']['version']
-        );
 
-        if (!$targetPackage) {
-            throw new \RuntimeException(sprintf('Could not find target package %s (%s) for installed patch',
-                $data['target_package']['name'],
-                $data['target_package']['version']
+        if (!$targetPackageInstalled = $this->matchTargetLoadedPackageToInstalled($targetPackage, $targetPackageLoaded, $patch)) {
+            throw new \LogicException(sprintf(
+                'Could not find target package %s for installed patch. This should not happen.',
+                $targetPackageLoaded->getPrettyName()
             ));
         }
 
-        return new PatchApplication($patch, $sourcePackage, $targetPackage, $data['hash']);
+        return new PatchApplication($patch, $sourcePackageInstalled, $targetPackageInstalled, $data['hash']);
     }
 
     /**
@@ -184,6 +259,24 @@ class PackageApplicationRepository
     }
 
     /**
+     * @param PackageInterface $package
+     * @return array
+     */
+    public function dumpPackageToArray($package) 
+    {
+        return $this->packageDumper->dump($package);
+    }
+
+    /**
+     * @param array $packageData
+     * @return PackageInterface
+     */
+    public function loadPackageFromArray($packageData) 
+    {
+        return $this->packageLoader->load($packageData);
+    }
+
+    /**
      * @param PatchApplication $application
      * @return array
      */
@@ -191,16 +284,8 @@ class PackageApplicationRepository
     {
         return [
             'hash' => $application->getHash(),
-            'target_package' => [
-                'name' => $application->getTargetPackage()->getName(),
-                'version' => $application->getTargetPackage()->getVersion(),
-                'ref' => $application->getTargetPackage()->getSourceReference(),
-            ],
-            'source_package' => [
-                'name' => $application->getSourcePackage()->getName(),
-                'version' => $application->getSourcePackage()->getVersion(),
-                'ref' => $application->getSourcePackage()->getSourceReference(),
-            ],
+            'target_package' => $this->dumpPackageToArray($application->getTargetPackage()),
+            'source_package' => $this->dumpPackageToArray($application->getSourcePackage()),
             'patch' => $application->getPatch()->toArray()
         ];
     }

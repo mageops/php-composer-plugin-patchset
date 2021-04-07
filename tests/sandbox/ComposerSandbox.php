@@ -237,6 +237,10 @@ class ComposerSandbox
             $this->phpBinary = $phpBinary;
         }
 
+        if (getenv('COMPOSER_SANDBOX_DISABLE_CLEANUP')) {
+            $this->disableCleanup();
+        }
+
         if (null === $selfPackageDir) {
             $selfPackageDir = static::getRootProjectDir();
         }
@@ -270,11 +274,6 @@ class ComposerSandbox
      */
     public function disableCleanup()
     {
-        $this->io->write(sprintf(
-            "   ---> Cleanup is disabled, keeping output buffer and root dir: <info>%s</info>", 
-            $this->rootDir
-        ));
-
         $this->cleanupDisabled = true;
     }
 
@@ -561,6 +560,11 @@ class ComposerSandbox
     public function cleanup()
     {
         if ($this->cleanupDisabled) {
+            $this->io->write(sprintf(
+                "   ---> Ignoring cleanup - keeping output buffer and root dir: <info>%s</info>", 
+                $this->rootDir
+            ));
+
             return;
         }
 

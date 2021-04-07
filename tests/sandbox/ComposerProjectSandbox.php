@@ -145,8 +145,6 @@ class ComposerProjectSandbox
 
         $config = array_merge($config, $this->config);
 
-        var_dump(($this->config));
-
         file_put_contents($this->getConfigPath(), json_encode($config, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES + JSON_UNESCAPED_UNICODE));
     }
 

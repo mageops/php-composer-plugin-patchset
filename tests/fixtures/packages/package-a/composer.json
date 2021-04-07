@@ -1,6 +1,6 @@
 {
     "name": "test/package-a",
     "type": "library",
-    "version": "dev-master",
+    "version": "1.0.0-dev",
     "require": {}
 }

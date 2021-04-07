@@ -76,13 +76,10 @@ abstract class ComposerSandboxTestCase extends TestCase
             ComposerSandbox::enableDebugOutput();
         }
 
-        $sb = new ComposerSandbox(
+        return new ComposerSandbox(
             $this->getComposerSandboxFixturesDir(),
             $this->getComposerSandboxIdentifier()            
         );
-        $sb->disableCleanup();
-
-        return $sb;
     }
 
     /**

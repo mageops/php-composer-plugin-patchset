@@ -44,9 +44,12 @@ _String that will be appended to every invocation of composer command._
 > **Warning!** Arguments passed through env vars must must be space-delimited
 > and each argument cannot contain space characters even if they are escaped.
 
-
 #### `COMPOSER_SANDBOX_TEST_DEBUG` - Enable extra debugging features
 
 If enabled sandbox directories of failed tests are preserved and composer
 command output is flushed for every test.
-   
+
+#### `COMPOSER_SANDBOX_DISABLE_CLEANUP` - Preserve sandbox temp dirs
+
+Do not remove the directory after running a test.
+  

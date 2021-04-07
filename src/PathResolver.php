@@ -8,7 +8,8 @@ use Composer\Package\RootPackageInterface;
 
 class PathResolver
 {
-    const PATCH_APPLICATION_DATA_FILENAME = 'composer.patches_applied.json';
+    const PATCH_APPLICATION_DATA_FILENAME = 'patches-applied.json';
+    const PATCH_APPLICATION_DATA_LEGACY_FILENAME = 'composer.patches_applied.json';
 
     /**
      * @var InstallationManager
