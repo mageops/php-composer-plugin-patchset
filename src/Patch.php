@@ -126,6 +126,13 @@ class Patch
 
     public static function createFromArray(array $data)
     {
+        $data = array_merge([
+            'version_constraint' => '*',
+            'description' => null,
+            'strip_path_components' => 1,
+            'method' => PatchApplicator::METHOD_PATCH,
+            'keep_empty_files' => false,
+        ], $data);
 
         return new static(
             $data['source_package'],
