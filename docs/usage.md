@@ -60,6 +60,25 @@ Apart from defining patches in a `patchset` type package, you can also do that i
 
 Just add the `"extra": {"patchset": {}}` configuration the same way as in a patchset package.
 
+## Skipping selected patches
+
+In some cases, you want to skip some patches from applying (for example when you use centralized patches repository, but when you don't know want to apply specific patch(es) for one project. You can do it by adding `patchset-ignore` node in `extra` section:
+
+```json
+
+"extra": {
+        "patchset-ignore": [
+            "essential/magento/framework/m243plus-security-MDVA-43395-MDVA-43443.patch",
+            "essential/magento/module-email/m243plus-security-MDVA-43395-MDVA-43443.patch"
+        ],
+        "patchset": {
+            "some-vendor-a/package-to-patch": [
+            ...
+        ]
+        ...
+```
+
+
 # JSON configuration reference 
 
 ## Patch properties
