@@ -51,6 +51,18 @@ class PatchCollector
             }
         }
 
+        $ignoredPatches = $this->collectIngoredPatches($repository);
+
+        $patches = array_filter($patches, function($callback) use ($ignoredPatches) {
+            foreach($ignoredPatches as $ignoredPatch){
+                if($ignoredPatch == $callback->getFilename()){
+                    return false;
+                }
+            }
+
+            return true;
+        });
+
         return $patches;
     }
 
@@ -108,5 +120,19 @@ class PatchCollector
         }
 
         return $patches;
+    }
+
+    private function collectIngoredPatches(RepositoryInterface $repository){
+        $ignoredPatches = [];
+
+        foreach($repository->getPackages() as $package){
+            $ignoredPatchesInPackage = $package->getExtra()['patchset-ignore'] ?? [];
+            foreach($ignoredPatchesInPackage as $ignoredPatchInPackage){
+                $this->logger->notice(sprintf('<error>IMPORTANT</error>: Patch will be skipped: <comment>%s</comment>', $ignoredPatchInPackage));
+                $ignoredPatches[] = $ignoredPatchInPackage;
+            }
+        }
+
+        return $ignoredPatches;
     }
 }
