@@ -68,8 +68,7 @@ In some cases, you want to skip some patches from applying (for example when you
 
 "extra": {
         "patchset-ignore": [
-            "essential/magento/framework/m243plus-security-MDVA-43395-MDVA-43443.patch",
-            "essential/magento/module-email/m243plus-security-MDVA-43395-MDVA-43443.patch"
+            "patches/patch-that-you-want-to-ignore.patch"
         ],
         "patchset": {
             "some-vendor-a/package-to-patch": [
