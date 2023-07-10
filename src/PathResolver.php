@@ -45,7 +45,7 @@ class PathResolver
      */
     public function getPatchSourceFilePath(PackageInterface $sourcePackage, Patch $patch)
     {
-        return rtrim($this->getPackageInstallPath($sourcePackage), '/') . '/' . ltrim($patch->getFilename(), '/');
+        return rtrim($this->getPackageInstallPath($sourcePackage) ?? '', '/') . '/' . ltrim($patch->getFilename(), '/');
     }
 
     /**
@@ -54,6 +54,6 @@ class PathResolver
      */
     public function getPackageApplicationFilename(PackageInterface $targetPackage)
     {
-        return rtrim($this->getPackageInstallPath($targetPackage), '/') . '/' . static::PATCH_APPLICATION_DATA_FILENAME;
+        return rtrim($this->getPackageInstallPath($targetPackage) ?? '', '/') . '/' . static::PATCH_APPLICATION_DATA_FILENAME;
     }
 }
