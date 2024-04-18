@@ -42,7 +42,7 @@ class IOLogger extends AbstractLogger
     /**
      * {@inheritdoc}
      */
-    public function log($level, $message, array $context = array())
+    public function log($level, string|\Stringable $message, array $context = []): void
     {
         $verbosity = self::VERBOSITY_LEVEL_MAP[$level];
 
