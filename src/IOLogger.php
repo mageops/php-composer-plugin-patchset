@@ -3,10 +3,10 @@
 namespace Creativestyle\Composer\Patchset;
 
 use Composer\IO\IOInterface;
-use Psr\Log\AbstractLogger;
+use Composer\IO\ConsoleIO;
 use Psr\Log\LogLevel;
 
-class IOLogger extends AbstractLogger
+class IOLogger extends ConsoleIO
 {
     const VERBOSITY_LEVEL_MAP = [
         LogLevel::DEBUG => IOInterface::DEBUG,
@@ -42,7 +42,7 @@ class IOLogger extends AbstractLogger
     /**
      * {@inheritdoc}
      */
-    public function log($level, string|\Stringable $message, array $context = []): void
+    public function log($level, $message, array $context = []): void
     {
         $verbosity = self::VERBOSITY_LEVEL_MAP[$level];
 
