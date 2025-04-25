@@ -39,7 +39,7 @@ class PatchApplication
         Patch $patch,
         PackageInterface $sourcePackage = null,
         PackageInterface $targetPackage,
-        $hash
+        string $hash
     ) {
         $this->patch = $patch;
         $this->sourcePackage = $sourcePackage;
