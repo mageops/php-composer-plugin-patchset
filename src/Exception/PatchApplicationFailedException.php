@@ -16,7 +16,7 @@ class PatchApplicationFailedException extends PatchingException
      */
     private $cmdOutput;
 
-    public function __construct(string $cmd, string $cmdOutput, string $message = "", int $code = 0, Throwable $previous = null)
+    public function __construct(string $cmd, string $cmdOutput, string $message = "", int $code = 0, ?Throwable $previous = null)
     {
         if (empty($message)) {
             $message = "Could not apply patch - command \"$cmd\" failed with: \n$cmdOutput";

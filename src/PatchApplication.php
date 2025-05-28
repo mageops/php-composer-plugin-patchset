@@ -37,7 +37,7 @@ class PatchApplication
      */
     public function __construct(
         Patch $patch,
-        PackageInterface $sourcePackage = null,
+        ?PackageInterface $sourcePackage = null,
         PackageInterface $targetPackage,
         string $hash
     ) {
