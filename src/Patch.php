@@ -69,14 +69,14 @@ class Patch
      * @param bool $keepEmptyFiles
      */
     public function __construct(
-        $sourcePackage,
-        $targetPackage,
-        $versionConstraint,
-        $filename,
-        $description,
-        $stripPathComponents = 1,
-        $method = PatchApplicator::METHOD_PATCH,
-        $keepEmptyFiles = false
+        string $sourcePackage,
+        string $targetPackage,
+        string $versionConstraint,
+        string $filename,
+        string $description,
+        int $stripPathComponents = 1,
+        string $method = PatchApplicator::METHOD_PATCH,
+        bool $keepEmptyFiles = false
     ) {
         $this->sourcePackage = $sourcePackage;
         $this->targetPackage = $targetPackage;
