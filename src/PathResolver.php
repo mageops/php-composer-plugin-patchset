@@ -8,24 +8,13 @@ use Composer\Package\RootPackageInterface;
 
 class PathResolver
 {
-    const PATCH_APPLICATION_DATA_FILENAME = 'composer.patches_applied.json';
-
-    /**
-     * @var InstallationManager
-     */
-    private $installationManager;
+    public const PATCH_APPLICATION_DATA_FILENAME = 'composer.patches_applied.json';
 
     public function __construct(
-        InstallationManager $installationManager
-    ) {
-        $this->installationManager = $installationManager;
-    }
+        private InstallationManager $installationManager
+    ) {}
 
-    /**
-     * @param PackageInterface $package
-     * @return string
-     */
-    public function getPackageInstallPath(PackageInterface $package)
+    public function getPackageInstallPath(PackageInterface $package): string
     {
         if ($package instanceof RootPackageInterface) {
             // This is not an ideal solution but should work for now.
@@ -38,21 +27,12 @@ class PathResolver
         return $installer->getInstallPath($package);
     }
 
-    /**
-     * @param PackageInterface $sourcePackage
-     * @param Patch $patch
-     * @return string
-     */
-    public function getPatchSourceFilePath(PackageInterface $sourcePackage, Patch $patch)
+    public function getPatchSourceFilePath(PackageInterface $sourcePackage, Patch $patch): string
     {
         return rtrim($this->getPackageInstallPath($sourcePackage) ?? '', '/') . '/' . ltrim($patch->getFilename(), '/');
     }
 
-    /**
-     * @param PackageInterface $targetPackage
-     * @return string
-     */
-    public function getPackageApplicationFilename(PackageInterface $targetPackage)
+    public function getPackageApplicationFilename(PackageInterface $targetPackage): string
     {
         return rtrim($this->getPackageInstallPath($targetPackage) ?? '', '/') . '/' . static::PATCH_APPLICATION_DATA_FILENAME;
     }

@@ -17,84 +17,37 @@ use Psr\Log\LoggerInterface;
 class Patcher
 {
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var Patch[]
      */
-    private $patches;
+    private array $patches;
 
-    /**
-     * @var PatchCollector
-     */
-    private $collector;
-
-    /**
-     * @var OperationResolver
-     */
-    private $operationResolver;
-
-    /**
-     * @var PatchApplicator
-     */
-    private $applicator;
-
-    /**
-     * @var InstallationManager
-     */
-    private $installationManager;
-
-    /**
-     * @var RepositoryManager
-     */
-    private $repositoryManager;
+    private PatchCollector $collector;
+    private PatchApplicator $applicator;
+    private ArrayRepository $installedRepository;
+    private PathResolver $pathResolver;
+    private PackageApplicationRepository $packageApplicationRepository;
 
     /**
      * @var PackagePatchApplication[]
      */
-    private $targetPackageApplications;
+    private array $targetPackageApplications;
 
     /**
      * @var PackagePatchApplication[]
      */
-    private $installedPackageApplications;
-
-    /**
-     * @var PathResolver
-     */
-    private $pathResolver;
-
-    /**
-     * @var PackageApplicationRepository
-     */
-    private $packageApplicationRepository;
+    private array $installedPackageApplications;
 
     /**
      * @var PackageInterface[]
      */
-    private $packagesToReinstall;
+    private array $packagesToReinstall;
 
     /**
      * @var PackageInterface[]
      */
-    private $packagesToPatch;
+    private array $packagesToPatch;
 
-    /**
-     * @var ProcessExecutor
-     */
-    private $processExecutor;
 
-    /**
-     * @var ArrayRepository
-     */
-    private $installedRepository;
-
-    /**
-     * @var RootPackageInterface
-     */
-    private $rootPackage;
 
     /**
      * The constructor computes state, so it needs to be called only after all packages have been installed
@@ -107,20 +60,14 @@ class Patcher
      * @param RootPackageInterface $rootPackage
      */
     public function __construct(
-        LoggerInterface $logger,
-        InstallationManager $installationManager,
-        RepositoryManager $repositoryManager,
-        ProcessExecutor $processExecutor,
-        RootPackageInterface $rootPackage
+        private LoggerInterface $logger,
+        private InstallationManager $installationManager,
+        private RepositoryManager $repositoryManager,
+        private ProcessExecutor $processExecutor,
+        private RootPackageInterface $rootPackage
     ) {
-        $this->logger = $logger;
-        $this->rootPackage = $rootPackage;
         $this->collector = new PatchCollector($this->logger);
-        $this->operationResolver = new OperationResolver();
-        $this->installationManager = $installationManager;
-        $this->repositoryManager = $repositoryManager;
         $this->pathResolver = new PathResolver($installationManager);
-        $this->processExecutor = $processExecutor;
         $this->installedRepository = $this->buildInstalledRepository();
 
         $this->applicator = new PatchApplicator(
@@ -141,14 +88,11 @@ class Patcher
         $this->targetPackageApplications = $this->computeTargetPackageApplications();
         $this->installedPackageApplications = $this->packageApplicationRepository->getPackageApplications();
 
-        list($this->packagesToReinstall, $this->packagesToPatch) = $this->computeChanges();
+        [$this->packagesToReinstall, $this->packagesToPatch] = $this->computeChanges();
 
     }
 
-    /**
-     * @return ArrayRepository
-     */
-    private function buildInstalledRepository()
+    private function buildInstalledRepository(): ArrayRepository
     {
         $repo = new ArrayRepository(array_map(function(PackageInterface $package) {
             return clone $package;
@@ -164,7 +108,7 @@ class Patcher
     /**
      * @return Patch[]
      */
-    private function collectPatches()
+    private function collectPatches(): array
     {
         return $this->collector->collectFromRepository(
            $this->installedRepository
@@ -174,7 +118,7 @@ class Patcher
     /**
      * @return PackagePatchApplication[]
      */
-    private function computeTargetPackageApplications()
+    private function computeTargetPackageApplications(): array
     {
         $packageApplications = [];
         $repo = $this->installedRepository;
@@ -245,12 +189,7 @@ class Patcher
         return $packageApplications;
     }
 
-    /**
-     * @param PackageInterface $sourcePackage
-     * @param Patch $patch
-     * @return string
-     */
-    private function computeApplicationHash(PackageInterface $sourcePackage, Patch $patch)
+    private function computeApplicationHash(PackageInterface $sourcePackage, Patch $patch): string
     {
         $sourcePath = $this->pathResolver->getPatchSourceFilePath($sourcePackage, $patch);
 
@@ -261,13 +200,14 @@ class Patcher
         return sha1_file($sourcePath);
     }
 
-    private function reinstallPackages()
+    private function reinstallPackages(): void
     {
         $localRepo = $this->repositoryManager->getLocalRepository();
 
         foreach ($this->packagesToReinstall as $package) {
             if ($package instanceof RootPackageInterface) {
-                $this->logger->warning(sprintf('Root package patches have changed but cannot reinstall it, will apply only new patches. You should reinstall the whole project to be safe.',
+                $this->logger->warning(
+                    sprintf('Root package patches have changed but cannot reinstall it, will apply only new patches. You should reinstall the whole project to be safe. Package: %s %s',
                     $package->getName(),
                     $package->getPrettyVersion()
                 ));
@@ -285,7 +225,7 @@ class Patcher
         }
     }
 
-    private function applyPatches()
+    private function applyPatches(): void
     {
         foreach ($this->targetPackageApplications as $packagePatchApplication) {
             if (!array_key_exists($packagePatchApplication->getTargetPackage()->getName(), $this->packagesToPatch)) {
@@ -338,20 +278,10 @@ class Patcher
         }
     }
 
-    private function applyPatchesToPackage(PackagePatchApplication $packagePatchApplication)
-    {
-
-    }
-
-    private function applyPatchesToRootPackage(PackagePatchApplication $packagePatchApplication)
-    {
-
-    }
-
     /**
-     * @return PackageInterface[]
+     * @return array[PackageInterface[], PackageInterface[]]
      */
-    private function computeChanges()
+    private function computeChanges(): array
     {
         $affectedPackages = array_unique(array_merge(
             array_keys($this->installedPackageApplications),
@@ -387,9 +317,9 @@ class Patcher
     }
 
     /**
-     * Executes the whole patching process
+     * @throws \Exception
      */
-    public function patch()
+    public function patch(): void
     {
         $this->reinstallPackages();
         $this->applyPatches();
@@ -402,7 +332,7 @@ class Patcher
     /**
      * @return PackagePatchApplication[]
      */
-    public function getTargetPackageApplications()
+    public function getTargetPackageApplications(): array
     {
         return $this->targetPackageApplications;
     }
@@ -410,7 +340,7 @@ class Patcher
     /**
      * @return PackagePatchApplication[]
      */
-    public function getInstalledPackageApplications()
+    public function getInstalledPackageApplications(): array
     {
         return $this->installedPackageApplications;
     }
@@ -418,7 +348,7 @@ class Patcher
     /**
      * @return PackageInterface[]
      */
-    public function getPackagesToReinstall()
+    public function getPackagesToReinstall(): array
     {
         return $this->packagesToReinstall;
     }
@@ -426,15 +356,12 @@ class Patcher
     /**
      * @return PackageInterface[]
      */
-    public function getPackagesToPatch()
+    public function getPackagesToPatch(): array
     {
         return $this->packagesToPatch;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasAnyActionsToPerform()
+    public function hasAnyActionsToPerform(): bool
     {
         return !empty($this->packagesToReinstall) || !empty($this->packagesToPatch);
     }

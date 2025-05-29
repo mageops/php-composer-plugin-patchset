@@ -10,43 +10,12 @@ use Psr\Log\LoggerInterface;
 
 class PackageApplicationRepository
 {
-    /**
-     * @var RepositoryInterface
-     */
-    private $installedRepository;
-
-    /**
-     * @var InstallationManager
-     */
-    private $installationManager;
-
-    /**
-     * @var PathResolver
-     */
-    private $pathResolver;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @param RepositoryInterface $installedRepository
-     * @param InstallationManager $installationManager
-     * @param PathResolver $pathResolver
-     * @param LoggerInterface $logger
-     */
     public function __construct(
-        RepositoryInterface $installedRepository,
-        InstallationManager $installationManager,
-        PathResolver $pathResolver,
-        LoggerInterface $logger
-    ) {
-        $this->installedRepository = $installedRepository;
-        $this->installationManager = $installationManager;
-        $this->pathResolver = $pathResolver;
-        $this->logger = $logger;
-    }
+        private RepositoryInterface $installedRepository,
+        private InstallationManager $installationManager,
+        private PathResolver $pathResolver,
+        private LoggerInterface $logger
+    ) {}
 
     /**
      * @return PackagePatchApplication[]

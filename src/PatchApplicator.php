@@ -39,6 +39,32 @@ class PatchApplicator
         }
     }
 
+    public function applyPatch(Patch $patch, PackageInterface $sourcePackage, PackageInterface $targetPackage): void
+    {
+        $targetDirectory = $this->pathResolver->getPackageInstallPath($targetPackage);
+        $patchFilename = $this->pathResolver->getPatchSourceFilePath($sourcePackage, $patch);
+
+        if (!$this->executePatchCommand($patch->getMethod(), $targetDirectory, $patchFilename, $patch->getStripPathComponents(), $patch->getKeepEmptyFiles())) {
+            $this->logger->notice(sprintf('<error>Failed to apply patch</error> <info>%s:%s</info> [<comment>%s</comment>] (<comment>%s</comment>) using <comment>%s</comment> method',
+                $patch->getSourcePackage(),
+                $patch->getFilename(),
+                $patch->getVersionConstraint(),
+                $patch->getDescription(),
+                $patch->getMethod()
+            ));
+
+            throw new PatchApplicationFailedException($this->lastCmd, $this->lastCmdOutput);
+        }
+
+        $this->logger->notice(sprintf('Applied patch <info>%s:%s</info> [<comment>%s</comment>] (<comment>%s</comment>) using <comment>%s</comment> method',
+            $patch->getSourcePackage(),
+            $patch->getFilename(),
+            $patch->getVersionConstraint(),
+            $patch->getDescription(),
+            $patch->getMethod()
+        ));
+    }
+
     private function executeCommand(array|string $cmd, ?string $cwd = null): int
     {
         if (is_array($cmd)) {
@@ -68,17 +94,9 @@ class PatchApplicator
         return $this->hasPatch;
     }
 
-    /**
-     * @param string $method
-     * @param string $targetDirectory
-     * @param string $patchFile
-     * @param int $stripPathComponents
-     * @param bool $keepEmptyFiles
-     * @return bool
-     */
-    private function executePatchCommand($method, $targetDirectory, $patchFile, $stripPathComponents, $keepEmptyFiles = false)
+    private function executePatchCommand(string $method, string $targetDirectory, string $patchFile, int $stripPathComponents, bool $keepEmptyFiles): bool
     {
-        $cwd = null;
+        $cwd = [];
 
         if ($method === self::METHOD_PATCH && $this->hasPatchCommand()) {
             $cmd = ['patch', '--batch', '--forward', '--strip=' . $stripPathComponents, '--input='.$patchFile,  '--directory='.$targetDirectory];
@@ -86,7 +104,6 @@ class PatchApplicator
             if (!$keepEmptyFiles) {
                 $cmd[] = '--remove-empty-files';
             }
-
         } else {
             $cmd = ['git', 'apply', '-v', '-p' . $stripPathComponents, $patchFile];
 
@@ -111,31 +128,5 @@ class PatchApplicator
         }
 
         return !$this->executeCommand($cmd, $cwd);
-    }
-
-    public function applyPatch(Patch $patch, PackageInterface $sourcePackage, PackageInterface $targetPackage): void
-    {
-        $targetDirectory = $this->pathResolver->getPackageInstallPath($targetPackage);
-        $patchFilename = $this->pathResolver->getPatchSourceFilePath($sourcePackage, $patch);
-
-        if (!$this->executePatchCommand($patch->getMethod(), $targetDirectory, $patchFilename, $patch->getStripPathComponents())) {
-            $this->logger->notice(sprintf('<error>Failed to apply patch</error> <info>%s:%s</info> [<comment>%s</comment>] (<comment>%s</comment>) using <comment>%s</comment> method',
-                $patch->getSourcePackage(),
-                $patch->getFilename(),
-                $patch->getVersionConstraint(),
-                $patch->getDescription(),
-                $patch->getMethod()
-            ));
-
-            throw new PatchApplicationFailedException($this->lastCmd, $this->lastCmdOutput);
-        }
-
-        $this->logger->notice(sprintf('Applied patch <info>%s:%s</info> [<comment>%s</comment>] (<comment>%s</comment>) using <comment>%s</comment> method',
-            $patch->getSourcePackage(),
-            $patch->getFilename(),
-            $patch->getVersionConstraint(),
-            $patch->getDescription(),
-            $patch->getMethod()
-        ));
     }
 }

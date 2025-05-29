@@ -6,15 +6,8 @@ use Throwable;
 
 class PatchApplicationFailedException extends PatchingException
 {
-    /**
-     * @var string
-     */
-    private $cmd;
-
-    /**
-     * @var string
-     */
-    private $cmdOutput;
+    private string $cmd;
+    private string $cmdOutput;
 
     public function __construct(string $cmd, string $cmdOutput, string $message = "", int $code = 0, ?Throwable $previous = null)
     {
@@ -28,18 +21,12 @@ class PatchApplicationFailedException extends PatchingException
         $this->cmdOutput = $cmdOutput;
     }
 
-    /**
-     * @return string
-     */
-    public function getCmd()
+    public function getCmd(): string
     {
         return $this->cmd;
     }
 
-    /**
-     * @return string
-     */
-    public function getCmdOutput()
+    public function getCmdOutput(): string
     {
         return $this->cmdOutput;
     }
