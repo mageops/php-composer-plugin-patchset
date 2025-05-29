@@ -96,7 +96,7 @@ class PatchApplicator
 
     private function executePatchCommand(string $method, string $targetDirectory, string $patchFile, int $stripPathComponents, bool $keepEmptyFiles): bool
     {
-        $cwd = [];
+        $cwd = null;
 
         if ($method === self::METHOD_PATCH && $this->hasPatchCommand()) {
             $cmd = ['patch', '--batch', '--forward', '--strip=' . $stripPathComponents, '--input='.$patchFile,  '--directory='.$targetDirectory];
