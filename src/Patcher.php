@@ -207,6 +207,13 @@ class Patcher
                 if ($patch->canBeAppliedTo($targetPackage)) {
                     $sourcePackage = $repo->findPackage($patch->getSourcePackage(), '*');
 
+                    if (!$sourcePackage) {
+                        $this->logger->debug(sprintf('Could not find source package %s (%s) for installed patch, it was removed probably',
+                            $patch->getSourcePackage(),
+                            $patch->getVersionConstraint(),
+                        ));
+                    }
+
                     $applicationHash = $this->computeApplicationHash($sourcePackage, $patch);
 
                     if (isset($applications[$applicationHash])) {
@@ -297,7 +304,7 @@ class Patcher
 
             /** @var PatchApplicationFailedException|null $applicationFailedException */
             $applicationFailedException = null;
-            
+
             /** @var PatchApplication[] $processedPatchApplications */
             $processedPatchApplications = [];
 

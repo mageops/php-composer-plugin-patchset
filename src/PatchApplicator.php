@@ -12,64 +12,26 @@ use Psr\Log\LoggerInterface;
 
 class PatchApplicator
 {
-    const METHOD_PATCH = 'patch';
-    const METHOD_GIT = 'git';
+    public const METHOD_PATCH = 'patch';
+    public const METHOD_GIT = 'git';
 
-    const METHODS = [
+    public const METHODS = [
         PatchApplicator::METHOD_PATCH,
         PatchApplicator::METHOD_GIT
     ];
 
-    /**
-     * @var InstallationManager
-     */
-    private $installationManager;
+    private Filesystem $filesystem;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var bool|null
-     */
-    private $hasPatch = null;
-
-    /**
-     * @var PathResolver
-     */
-    private $pathResolver;
-
-    /**
-     * @var ProcessExecutor
-     */
-    private $executor;
-
-    /**
-     * @var string
-     */
-    private $lastCmd;
-
-    /**
-     * @var string
-     */
-    private $lastCmdOutput;
-
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
+    private string $lastCmd;
+    private string $lastCmdOutput;
+    private bool $hasPatch;
 
     public function __construct(
-        LoggerInterface $logger,
-        InstallationManager $installationManager,
-        PathResolver $pathResolver,
-        ProcessExecutor $executor
+        protected LoggerInterface $logger,
+        protected InstallationManager $installationManager,
+        protected PathResolver $pathResolver,
+        protected ProcessExecutor $executor
     ) {
-        $this->logger = $logger;
-        $this->installationManager = $installationManager;
-        $this->pathResolver = $pathResolver;
-        $this->executor = $executor;
         $this->filesystem = new Filesystem($this->executor);
 
         if (!$this->hasPatchCommand()) {
@@ -77,12 +39,7 @@ class PatchApplicator
         }
     }
 
-    /**
-     * @param array|string $cmd
-     * @param string|null $cwd
-     * @return int Return code
-     */
-    private function executeCommand($cmd, $cwd = null)
+    private function executeCommand(array|string $cmd, ?string $cwd = null): int
     {
         if (is_array($cmd)) {
             $cmd = $cmd[0] . ' ' .implode(' ', array_map([ProcessExecutor::class, 'escape'], array_slice($cmd, 1)));
@@ -102,12 +59,9 @@ class PatchApplicator
         return $returnCode;
     }
 
-    /**
-     * @return bool
-     */
-    private function hasPatchCommand()
+    private function hasPatchCommand(): bool
     {
-        if (null === $this->hasPatch) {
+        if (!isset($this->hasPatch)) {
             $this->hasPatch = !$this->executeCommand('command -v patch');
         }
 
@@ -159,7 +113,7 @@ class PatchApplicator
         return !$this->executeCommand($cmd, $cwd);
     }
 
-    public function applyPatch(Patch $patch, PackageInterface $sourcePackage, PackageInterface $targetPackage)
+    public function applyPatch(Patch $patch, PackageInterface $sourcePackage, PackageInterface $targetPackage): void
     {
         $targetDirectory = $this->pathResolver->getPackageInstallPath($targetPackage);
         $patchFilename = $this->pathResolver->getPatchSourceFilePath($sourcePackage, $patch);
