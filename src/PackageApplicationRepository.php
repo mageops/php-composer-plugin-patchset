@@ -39,6 +39,7 @@ class PackageApplicationRepository
 
     /**
      * @param PackageInterface $targetPackage
+     *
      * @return PackagePatchApplication
      */
     public function getPackageApplication(PackageInterface $targetPackage)
@@ -74,18 +75,21 @@ class PackageApplicationRepository
             throw new \RuntimeException(sprintf('Package directory is not writable "%s"', dirname($dataFile)));
         }
 
-        file_put_contents($dataFile,
+        file_put_contents(
+            $dataFile,
             $this->encodeData($this->transformPackagePatchApplicationToArray($packagePatchApplication))
         );
     }
 
     /**
      * @param array $data
+     *
      * @return string
      */
     private function encodeData(array $data)
     {
-        return json_encode($data,
+        return json_encode(
+            $data,
             JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES + JSON_UNESCAPED_UNICODE
         );
     }
@@ -93,20 +97,28 @@ class PackageApplicationRepository
     /**
      * @param PackageInterface $targetPackage
      * @param array $data
+     *
      * @return PackagePatchApplication
      */
-    private function createPackagePatchApplication(PackageInterface $targetPackage, array $data)
+    private function createPackagePatchApplication(PackageInterface $targetPackage, array $data): PackagePatchApplication
     {
-        return new PackagePatchApplication($targetPackage,
-            array_map([$this, 'createPatchApplication'], $data['patches'])
+        $applications = [];
+
+        foreach ($data['patches'] as $patchData) {
+            $patchApplication = $this->createPatchApplication($patchData);
+
+            if ($patchApplication) {
+                $applications[] = $patchApplication;
+            }
+        }
+
+        return new PackagePatchApplication(
+            $targetPackage,
+            $applications
         );
     }
 
-    /**
-     * @param array $data
-     * @return PatchApplication
-     */
-    private function createPatchApplication(array $data)
+    private function createPatchApplication(array $data): ?PatchApplication
     {
         $patch = Patch::createFromArray($data['patch']);
 
@@ -116,10 +128,15 @@ class PackageApplicationRepository
         );
 
         if (!$sourcePackage) {
-            $this->logger->debug(sprintf('Could not find source package %s (%s) for installed patch, it was removed probably',
-                $data['source_package']['name'],
-                $data['source_package']['version']
-            ));
+            $this->logger->debug(
+                sprintf(
+                    'Could not find source package %s (%s) for installed patch, it was removed probably',
+                    $data['source_package']['name'],
+                    $data['source_package']['version']
+                )
+            );
+
+            return null;
         }
 
         $targetPackage = $this->installedRepository->findPackage(
@@ -128,35 +145,30 @@ class PackageApplicationRepository
         );
 
         if (!$targetPackage) {
-            throw new \RuntimeException(sprintf('Could not find target package %s (%s) for installed patch',
-                $data['target_package']['name'],
-                $data['target_package']['version']
-            ));
+            throw new \RuntimeException(
+                sprintf(
+                    'Could not find target package %s (%s) for installed patch',
+                    $data['target_package']['name'],
+                    $data['target_package']['version']
+                )
+            );
         }
 
         return new PatchApplication($patch, $sourcePackage, $targetPackage, $data['hash']);
     }
 
-    /**
-     * @param PackagePatchApplication $packageApplication
-     * @return array
-     */
-    public function transformPackagePatchApplicationToArray(PackagePatchApplication $packageApplication)
+    public function transformPackagePatchApplicationToArray(PackagePatchApplication $packageApplication): array
     {
         return [
             'hash' => $packageApplication->getHash(),
             'patches' => array_map(
                 [$this, 'transformPatchApplicationToArray'],
                 $packageApplication->getApplications()
-            )
+            ),
         ];
     }
 
-    /**
-     * @param PatchApplication $application
-     * @return array
-     */
-    public function transformPatchApplicationToArray(PatchApplication $application)
+    public function transformPatchApplicationToArray(PatchApplication $application): array
     {
         return [
             'hash' => $application->getHash(),
@@ -170,7 +182,7 @@ class PackageApplicationRepository
                 'version' => $application->getSourcePackage()->getVersion(),
                 'ref' => $application->getSourcePackage()->getSourceReference(),
             ],
-            'patch' => $application->getPatch()->toArray()
+            'patch' => $application->getPatch()->toArray(),
         ];
     }
 }

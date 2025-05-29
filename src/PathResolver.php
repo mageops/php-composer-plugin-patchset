@@ -14,7 +14,7 @@ class PathResolver
         private InstallationManager $installationManager
     ) {}
 
-    public function getPackageInstallPath(PackageInterface $package): string
+    public function getPackageInstallPath(PackageInterface $package): ?string
     {
         if ($package instanceof RootPackageInterface) {
             // This is not an ideal solution but should work for now.
