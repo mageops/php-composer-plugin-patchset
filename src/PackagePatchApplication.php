@@ -9,55 +9,35 @@ use Composer\Package\PackageInterface;
  */
 class PackagePatchApplication
 {
-    /**
-     * @var PatchApplication[]
-     */
-    private $applications;
+    private string $hash;
 
     /**
-     * @var PackageInterface
-     */
-    private $targetPackage;
-
-    /**
-     * @var string
-     */
-    private $hash;
-
-    /**
-     * @param PackageInterface $targetPackage
      * @param PatchApplication[] $applications
      */
-    public function __construct(PackageInterface $targetPackage, array $applications)
+    public function __construct(private PackageInterface $targetPackage, private array $applications)
     {
         $this->validate($targetPackage, $applications);
 
-        $this->applications = $applications;
-        $this->targetPackage = $targetPackage;
         $this->hash = $this->computeHash($targetPackage, $applications);
     }
 
     /**
      * @return PatchApplication[]
      */
-    public function getApplications()
+    public function getApplications(): array
     {
         return $this->applications;
     }
 
-    /**
-     * @return PackageInterface
-     */
-    public function getTargetPackage()
+    public function getTargetPackage(): PackageInterface
     {
         return $this->targetPackage;
     }
 
     /**
-     * @param PackageInterface $targetPackage
      * @param PatchApplication[] $applications
      */
-    private function validate(PackageInterface $targetPackage, array $applications)
+    private function validate(PackageInterface $targetPackage, array $applications): void
     {
         foreach ($applications as $application) {
             if (!$application->getPatch()->canBeAppliedTo($targetPackage)) {
@@ -66,20 +46,15 @@ class PackagePatchApplication
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getHash()
+    public function getHash(): string
     {
         return $this->hash;
     }
 
     /**
-     * @param PackageInterface $targetPackage
      * @param PatchApplication[] $applications
-     * @return string
      */
-    private function computeHash(PackageInterface $targetPackage, array $applications)
+    private function computeHash(PackageInterface $targetPackage, array $applications): string
     {
         return sha1(
             $targetPackage->getSourceReference() .

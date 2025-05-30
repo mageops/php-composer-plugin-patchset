@@ -8,7 +8,7 @@ use Psr\Log\LogLevel;
 
 class IOLogger extends ConsoleIO
 {
-    const VERBOSITY_LEVEL_MAP = [
+    public const VERBOSITY_LEVEL_MAP = [
         LogLevel::DEBUG => IOInterface::DEBUG,
         LogLevel::INFO => IOInterface::NORMAL,
         LogLevel::NOTICE => IOInterface::QUIET,
@@ -19,7 +19,7 @@ class IOLogger extends ConsoleIO
         LogLevel::EMERGENCY => IOInterface::QUIET
     ];
 
-    const ERROR_LEVELS = [
+    public const ERROR_LEVELS = [
         LogLevel::ERROR,
         LogLevel::CRITICAL,
         LogLevel::ALERT,

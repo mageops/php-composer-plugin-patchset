@@ -14,12 +14,8 @@ class OperationResolver
 {
     /**
      * Returns a repository that reflects the state after operations have been executed on the current one.
-     *
-     * @param RepositoryInterface $repository
-     * @param array $operations
-     * @return RepositoryInterface
      */
-    public function resolveState(RepositoryInterface $repository, array $operations)
+    public function resolveState(RepositoryInterface $repository, array $operations): InstalledArrayRepository
     {
         $packages = array_map(function($p) { return clone $p; }, $repository->getPackages());
         $installed = new InstalledArrayRepository($packages);

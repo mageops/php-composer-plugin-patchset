@@ -16,64 +16,38 @@ use Psr\Log\LoggerInterface;
 
 class Plugin implements PluginInterface, EventSubscriberInterface
 {
-    /**
-     * @var IOInterface
-     */
-    private $io;
+    private IOInterface $io;
+    private LoggerInterface $logger;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function activate(Composer $composer, IOInterface $io)
+    public function activate(Composer $composer, IOInterface $io): void
     {
         $this->io = $io;
         $this->logger = new IOLogger($io);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deactivate(Composer $composer, IOInterface $io)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function uninstall(Composer $composer, IOInterface $io)
     {
     }
 
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ScriptEvents::PRE_AUTOLOAD_DUMP => 'onPreAutoloadDump'
         ];
     }
 
-    /**
-     * @param ScriptEvent $event
-     */
-    public function onPreAutoloadDump(ScriptEvent $event)
+    public function onPreAutoloadDump(ScriptEvent $event): void
     {
         // Execute patching before autoload is dumped because it may
         // change after patching under some circumstances...
         $this->applyPatches($event->getComposer());
     }
 
-    /**
-     * @param Composer $composer
-     */
-    public function applyPatches(Composer $composer)
+    public function applyPatches(Composer $composer): void
     {
         $patcher = new Patcher(
             $this->logger,

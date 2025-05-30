@@ -8,42 +8,26 @@ use Creativestyle\Composer\Patchset\Tests\Functional\Fixtures\ComposerSandbox;
 
 abstract class SandboxTestCase extends TestCase
 {
-    /**
-     * @var ComposerSandbox
-     */
-    public static $sandbox;
+    public static ?ComposerSandbox $sandbox = null;
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         ComposerSandbox::$debugOutputEnabled = isset($_SERVER['argv']) && in_array('--debug', $_SERVER['argv']);
 
         static::$sandbox = new ComposerSandbox();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
+    protected function tearDown(): void
     {
-        /* Clean up projects in between tests */
         static::$sandbox->cleanupProjects();
     }
 
-    /**
-     * @return ComposerSandbox
-     */
-    protected function getSandbox()
+    protected function getSandbox(): ComposerSandbox
     {
         return static::$sandbox;
     }
 
-    /**
-     * @param ComposerRun $composerRun
-     */
-    protected function assertThatComposerRunWasSuccessful(ComposerRun $composerRun)
+    protected function assertThatComposerRunWasSuccessful(ComposerRun $composerRun): void
     {
         $this->assertTrue($composerRun->getProject()->hasLockFile(), '`composer.lock` has been created');
         $this->assertTrue($composerRun->getProject()->hasVendorsInstalled(), 'vendors have been installed');
@@ -98,10 +82,7 @@ abstract class SandboxTestCase extends TestCase
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         static::$sandbox->cleanup();
         static::$sandbox = null;

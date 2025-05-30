@@ -12,21 +12,12 @@ use Psr\Log\LoggerInterface;
 
 class PatchCollector
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
+    public function __construct(private LoggerInterface $logger) {}
 
     /**
-     * @param RepositoryInterface $repository
      * @return Patch[]
      */
-    public function collectFromRepository(RepositoryInterface $repository)
+    public function collectFromRepository(RepositoryInterface $repository): array
     {
         $patches = [];
         $packages = $repository->getPackages();
@@ -44,34 +35,24 @@ class PatchCollector
             $patches = array_merge($patches, $packagePatches);
 
             if (count($packagePatches)) {
-                $this->logger->debug(sprintf('Collected <comment>%d</comment> patches from <info>%s</info>',
-                    count($packagePatches),
-                    $package->getName())
+                $this->logger->debug(
+                    sprintf(
+                        'Collected <comment>%d</comment> patches from <info>%s</info>',
+                        count($packagePatches),
+                        $package->getName()
+                    )
                 );
             }
         }
 
-        $ignoredPatches = $this->collectIngoredPatches($repository);
+        $ignoredPatches = $this->collectIgnoredPatches($repository);
 
-        $patches = array_filter($patches, function($callback) use ($ignoredPatches) {
-            foreach($ignoredPatches as $ignoredPatch){
-                if($ignoredPatch == $callback->getFilename()){
-                    return false;
-                }
-            }
-
-            return true;
+        return array_filter($patches, function ($callback) use ($ignoredPatches) {
+            return !in_array($callback->getFilename(), $ignoredPatches);
         });
-
-        return $patches;
     }
 
-    /**
-     * @param PackageInterface $a
-     * @param PackageInterface $b
-     * @return int
-     */
-    protected function comparePackagesForSort(PackageInterface $a, PackageInterface $b)
+    protected function comparePackagesForSort(PackageInterface $a, PackageInterface $b): int
     {
         if ($a->getName() === $b->getName()) {
             return strcmp($a->getVersion(), $b->getVersion());
@@ -81,10 +62,9 @@ class PatchCollector
     }
 
     /**
-     * @param PackageInterface $package
      * @return Patch[]
      */
-    protected function collectFromPackage(PackageInterface $package)
+    protected function collectFromPackage(PackageInterface $package): array
     {
         if (!$this->isAValidPatchset($package)) {
             $this->logger->debug(sprintf('Package <info>%s</info> is not a patchset', $package->getName()));
@@ -96,20 +76,17 @@ class PatchCollector
     }
 
     /**
-     * @param PackageInterface $package
      * @return bool
      */
-    public function isAValidPatchset(PackageInterface $package)
+    public function isAValidPatchset(PackageInterface $package): bool
     {
         return ($package instanceof RootPackageInterface || $package->getType() === 'patchset') && isset($package->getExtra()['patchset']);
     }
 
     /**
-     * @param string $sourcePackage
-     * @param array $patchList
      * @return Patch[]
      */
-    private function createPatches($sourcePackage, array $patchList)
+    private function createPatches(string $sourcePackage, array $patchList): array
     {
         $patches = [];
 
@@ -122,12 +99,13 @@ class PatchCollector
         return $patches;
     }
 
-    private function collectIngoredPatches(RepositoryInterface $repository){
+    private function collectIgnoredPatches(RepositoryInterface $repository): array
+    {
         $ignoredPatches = [];
 
-        foreach($repository->getPackages() as $package){
+        foreach ($repository->getPackages() as $package) {
             $ignoredPatchesInPackage = $package->getExtra()['patchset-ignore'] ?? [];
-            foreach($ignoredPatchesInPackage as $ignoredPatchInPackage){
+            foreach ($ignoredPatchesInPackage as $ignoredPatchInPackage) {
                 $this->logger->notice(sprintf('<error>IMPORTANT</error>: Patch will be skipped: <comment>%s</comment>', $ignoredPatchInPackage));
                 $ignoredPatches[] = $ignoredPatchInPackage;
             }

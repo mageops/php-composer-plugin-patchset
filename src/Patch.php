@@ -8,93 +8,18 @@ use Composer\Semver\Semver;
 
 class Patch
 {
-    /**
-     * Name of the patchset package the patch came from.
-     *
-     * @var string
-     */
-    private $sourcePackage;
-
-    /**
-     * Name of the package to be patched.
-     *
-     * @var string
-     */
-    private $targetPackage;
-
-    /**
-     * Short description of the patch
-     *
-     * @var string|null
-     */
-    private $description;
-
-    /**
-     * Version constraint that the package version will be checked against.
-     *
-     * @var string|null
-     */
-    private $versionConstraint;
-
-    /**
-     * Patch file location.
-     *
-     * @var string
-     */
-    private $filename;
-
-    /**
-     * @var int
-     */
-    private $stripPathComponents = 1;
-
-    /**
-     * @var string
-     */
-    private $method = PatchApplicator::METHOD_PATCH;
-
-    /**
-     * @var bool
-     */
-    private $keepEmptyFiles;
-
-    /**
-     * @param $sourcePackage
-     * @param string $targetPackage
-     * @param string $versionConstraint
-     * @param string $filename
-     * @param string $description
-     * @param int $stripPathComponents
-     * @param string $method
-     * @param bool $keepEmptyFiles
-     */
     public function __construct(
-        string $sourcePackage,
-        string $targetPackage,
-        string $versionConstraint,
-        string $filename,
-        string $description,
-        int $stripPathComponents = 1,
-        string $method = PatchApplicator::METHOD_PATCH,
-        bool $keepEmptyFiles = false
-    ) {
-        $this->sourcePackage = $sourcePackage;
-        $this->targetPackage = $targetPackage;
-        $this->versionConstraint = $versionConstraint;
-        $this->filename = $filename;
-        $this->description = $description;
-        $this->stripPathComponents = $stripPathComponents;
-        $this->method = $method;
-        $this->keepEmptyFiles = $keepEmptyFiles;
-    }
+        private string $sourcePackage,
+        private string $targetPackage,
+        private string $versionConstraint,
+        private string $filename,
+        private string $description,
+        private int $stripPathComponents = 1,
+        private string $method = PatchApplicator::METHOD_PATCH,
+        private bool $keepEmptyFiles = false
+    ) {}
 
-    /**
-     * @param string $sourcePackage
-     * @param string $targetPackage
-     * @param array $config
-     * @return Patch
-     */
-    public static function createFromConfig($sourcePackage, $targetPackage, array $config)
+    public static function createFromConfig(string $sourcePackage, string $targetPackage, array $config): Patch
     {
         $config = array_merge([
             'version-constraint' => '*',
@@ -146,11 +71,7 @@ class Patch
         );
     }
 
-    /**
-     * @param PackageInterface $package
-     * @return bool
-     */
-    public function canBeAppliedTo(PackageInterface $package)
+    public function canBeAppliedTo(PackageInterface $package): bool
     {
         if ($package->getName() !== $this->targetPackage) {
             return false;
@@ -163,71 +84,47 @@ class Patch
         return true;
     }
 
-    /**
-     * @return string
-     */
-    public function getSourcePackage()
+    public function getSourcePackage(): string
     {
         return $this->sourcePackage;
     }
 
-    /**
-     * @return string
-     */
-    public function getTargetPackage()
+    public function getTargetPackage(): string
     {
         return $this->targetPackage;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getVersionConstraint()
+    public function getVersionConstraint(): ?string
     {
         return $this->versionConstraint;
     }
 
-    /**
-     * @return string
-     */
-    public function getFilename()
+    public function getFilename(): string
     {
         return $this->filename;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    /**
-     * @return int
-     */
-    public function getStripPathComponents()
+    public function getStripPathComponents(): int
     {
         return $this->stripPathComponents;
     }
 
-    /**
-     * @return bool
-     */
-    public function getKeepEmptyFiles()
+    public function getKeepEmptyFiles(): bool
     {
         return $this->keepEmptyFiles;
     }
 
-    /**
-     * @return string
-     */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'source_package' => $this->sourcePackage,
